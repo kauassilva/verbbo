@@ -1,11 +1,11 @@
-Crie o numero a valendo 5 e crie o numero b valendo 3
+Crie o numero $a valendo 5 e crie o numero $b valendo 3
 Some 10 com 20 e mostre resultado
 Subtraia 5 de 15
 Multiplique 7 por 8
 Divida 100 por 4
-Se x maior que 10 mostre x
-Se idade maior ou igual 18 mostre "Adulto" senão mostre "Menor"
-Se x menor que 5 mostre x
-Crie um numero para o contador valendo 0
-Se x maior que 10 e x menor que 100 mostre x
-Crie o numero total valendo 0 e adicione 10 ao total e multiplique total por 2 e mostre total
+Se $x maior que 10 mostre $x
+Se $idade maior ou igual 18 mostre "Adulto" senão mostre "Menor"
+Se $x menor que 5 mostre $x
+Crie um numero para o $contador valendo 0
+Se $x maior que 10 e $x menor que 100 mostre $x
+Crie o numero $total valendo 0 e adicione 10 ao $total e multiplique $total por 2 e mostre $total

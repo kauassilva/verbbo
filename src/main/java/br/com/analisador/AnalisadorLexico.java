@@ -64,6 +64,7 @@ public class AnalisadorLexico {
 
     public void exibirTokens(List<Token> tokens) {
         System.out.println("\n=== ANÁLISE LÉXICA ===");
+        System.out.println("Script analisado: " + texto);
         System.out.println("Total de tokens encontrados: " + tokens.size());
 
         if (tokensDescartados > 0) {

@@ -18,10 +18,9 @@ public class Main {
 
         try {
             List<String> linhasScript = Files.readAllLines(caminhoScript);
-            linhasScript.forEach(System.out::println);
+//            linhasScript.forEach(System.out::println);
 
             for (String linha : linhasScript) {
-                System.out.println("Analisando linha: " + linha);
                 AnalisadorLexico analisadorLexico = new AnalisadorLexico(linha);
                 List<Token> tokens = analisadorLexico.analisar();
                 analisadorLexico.exibirTokens(tokens);
