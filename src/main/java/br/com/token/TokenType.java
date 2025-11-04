@@ -43,5 +43,6 @@ public enum TokenType {
     CONDICIONAL_SENAO,
     CONDICIONAL_ENTAO,
 
+    ERRO,
     DESCARTE
 }

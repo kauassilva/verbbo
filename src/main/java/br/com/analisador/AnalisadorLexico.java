@@ -1,5 +1,6 @@
 package br.com.analisador;
 
+import br.com.excecoes.ErroLexicoException;
 import br.com.palavras_reservadas.PalavrasReservadas;
 import br.com.token.Token;
 import br.com.token.TokenType;
@@ -12,15 +13,19 @@ public class AnalisadorLexico {
     private int posicao;
     private char caractereAtual;
     private int tokensDescartados;
+    private int linha;
+    private int coluna;
 
     public AnalisadorLexico(String texto) {
         this.texto = texto;
         this.posicao = 0;
         this.caractereAtual = !texto.isEmpty() ? texto.charAt(0) : '\0';
         this.tokensDescartados = 0;
+        this.linha = 1;
+        this.coluna = 1;
     }
 
-    public List<Token> analisar() {
+    public List<Token> analisar() throws ErroLexicoException {
         List<Token> tokens = new ArrayList<>();
         tokensDescartados = 0;
 
@@ -32,27 +37,41 @@ public class AnalisadorLexico {
 
             Token token;
 
-            // Numero
-            if (Character.isDigit(caractereAtual)) {
+            if (caractereAtual == '$') {
+                token = lerVariavel();
+            }
+
+            else if (Character.isDigit(caractereAtual)) {
                 token = lerNumero();
             }
-            // Texto entre aspas
+
             else if (caractereAtual == '"') {
                 token = lerTexto();
             }
-            // Palavras-chaves ou identificadores
-            else if (Character.isLetter(caractereAtual) || "áàâãéêíóôõúç".indexOf(caractereAtual) >= 0) {
+
+            else if (Character.isLetter(caractereAtual) || isCaractereAcentuado(caractereAtual)) {
                 token = lerPalavra();
             }
-            // Operadores e simbolos
+
             else if (";<>:()=!+-*/".indexOf(caractereAtual) >= 0) {
                 token = lerOperadorOuSimbolo();
             } else {
-                avancar();
-                continue;
+                throw new ErroLexicoException(
+                        "Caractere invalido encontrado",
+                        posicao,
+                        String.valueOf(caractereAtual)
+                );
             }
 
-            // Adicionar o token se não for do tipo DESCARTE
+            if (token.getTipo() == TokenType.ERRO) {
+                throw new ErroLexicoException(
+                        "Token invalido: " + token.getValor(),
+                        posicao - token.getValor().length(),
+                        token.getValor()
+                );
+            }
+
+
             if (token.getTipo() != TokenType.DESCARTE)
                 tokens.add(token);
             else
@@ -63,11 +82,11 @@ public class AnalisadorLexico {
     }
 
     public void exibirTokens(List<Token> tokens) {
-        System.out.println("\n=== ANÁLISE LÉXICA ===");
+        System.out.println("\n=== ANALISE LEXICA ===");
         System.out.println("Total de tokens encontrados: " + tokens.size());
 
         if (tokensDescartados > 0) {
-            System.out.println("Tokens descartados (artigos/preposições): " + tokensDescartados);
+            System.out.println("Tokens descartados (artigos/preposicoes): " + tokensDescartados);
         }
 
         System.out.println("\nTokens identificados:");
@@ -81,13 +100,26 @@ public class AnalisadorLexico {
         System.out.println("-".repeat(60));
     }
 
+    private boolean isCaractereAcentuado(char c) {
+        String acentuados = "áàâãéêíóôõúçÁÀÂÃÉÊÍÓÔÕÚÇ";
+        return acentuados.indexOf(c) >= 0;
+    }
+
     private void pularEspacos() {
-        while (caractereAtual != '\0' && Character.isWhitespace(caractereAtual))
+        while (caractereAtual != '\0' && Character.isWhitespace(caractereAtual)) {
+            if (caractereAtual == '\n') {
+                linha++;
+                coluna = 1;
+            } else {
+                coluna++;
+            }
             avancar();
+        }
     }
 
     private void avancar() {
         posicao++;
+        coluna++;
 
         if (posicao < texto.length())
             caractereAtual = texto.charAt(posicao);
@@ -95,10 +127,49 @@ public class AnalisadorLexico {
             caractereAtual = '\0';
     }
 
+    private Token lerVariavel() {
+        StringBuilder variavel = new StringBuilder();
+        variavel.append(caractereAtual);
+        avancar();
+
+        if (caractereAtual == '\0' || Character.isWhitespace(caractereAtual)) {
+            return new Token(TokenType.ERRO, variavel.toString());
+        }
+
+        if (caractereAtual == '$') {
+            variavel.append(caractereAtual);
+            return new Token(TokenType.ERRO, variavel.toString());
+        }
+
+        if (!Character.isLetter(caractereAtual) && !isCaractereAcentuado(caractereAtual)) {
+            variavel.append(caractereAtual);
+            return new Token(TokenType.ERRO, variavel.toString());
+        }
+
+        while (caractereAtual != '\0' &&
+                (Character.isLetterOrDigit(caractereAtual) ||
+                        isCaractereAcentuado(caractereAtual) ||
+                        caractereAtual == '_')) {
+            variavel.append(caractereAtual);
+            avancar();
+        }
+
+        return new Token(TokenType.IDENTIFICADOR, variavel.toString());
+    }
+
     private Token lerNumero() {
         StringBuilder numero = new StringBuilder();
+        boolean temPonto = false;
 
         while (caractereAtual != '\0' && (Character.isDigit(caractereAtual) || caractereAtual == '.')) {
+            if (caractereAtual == '.') {
+                if (temPonto) {
+                    numero.append(caractereAtual);
+                    avancar();
+                    return new Token(TokenType.ERRO, numero.toString());
+                }
+                temPonto = true;
+            }
             numero.append(caractereAtual);
             avancar();
         }
@@ -108,7 +179,7 @@ public class AnalisadorLexico {
 
     private Token lerTexto() {
         StringBuilder texto = new StringBuilder();
-        avancar(); // pula a primeira aspas
+        avancar();
 
         while (caractereAtual != '\0' && caractereAtual != '"') {
             texto.append(caractereAtual);
@@ -124,35 +195,27 @@ public class AnalisadorLexico {
     private Token lerPalavra() {
         StringBuilder palavra = new StringBuilder();
 
-        // Lê letras, números e acentos
-        while (caractereAtual != '\0' && (Character.isLetterOrDigit(caractereAtual) ||
-                caractereAtual == 'á' || caractereAtual == 'à' || caractereAtual == 'â' || caractereAtual == 'ã' ||
-                caractereAtual == 'é' || caractereAtual == 'ê' ||
-                caractereAtual == 'í' ||
-                caractereAtual == 'ó' || caractereAtual == 'ô' || caractereAtual == 'õ' ||
-                caractereAtual == 'ú' ||
-                caractereAtual == 'ç' ||
-                caractereAtual == '_')) {
+        while (caractereAtual != '\0' &&
+                (Character.isLetterOrDigit(caractereAtual) ||
+                        isCaractereAcentuado(caractereAtual) ||
+                        caractereAtual == '_')) {
             palavra.append(caractereAtual);
             avancar();
         }
 
         String palavraString = palavra.toString();
 
-        // Verifica se é uma palavra-chave
         TokenType tipo = PalavrasReservadas.MAP.get(palavraString.toLowerCase());
 
         if (tipo != null)
             return new Token(tipo, palavraString);
 
-        // Se não for palavra-chave, é um identificador
         return new Token(TokenType.IDENTIFICADOR, palavraString);
     }
 
     private Token lerOperadorOuSimbolo() {
         char simbolo = caractereAtual;
 
-        // Verificar simbolos compostos
         if (simbolo == '<' && espiar() == '=') {
             avancar();
             avancar();
@@ -169,7 +232,6 @@ public class AnalisadorLexico {
             return new Token(TokenType.COMPARADOR_DIFERENTE, "!=");
         }
 
-        // Simbolos simples
         String simboloString = String.valueOf(simbolo);
         TokenType tipo = PalavrasReservadas.MAP.get(simboloString);
         avancar();
@@ -177,7 +239,6 @@ public class AnalisadorLexico {
         if (tipo != null)
             return new Token(tipo, simboloString);
 
-        // Se não reconhecer, descarta
         return new Token(TokenType.DESCARTE, simboloString);
     }
 
@@ -188,5 +249,13 @@ public class AnalisadorLexico {
             return texto.charAt(proximaPosicao);
 
         return '\0';
+    }
+
+    public int getLinha() {
+        return linha;
+    }
+
+    public int getColuna() {
+        return coluna;
     }
 }
