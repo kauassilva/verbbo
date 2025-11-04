@@ -46,6 +46,8 @@ public class PalavrasReservadas {
         add(new String[]{"."}, TokenType.PONTUACAO_PONTO);
         add(new String[]{":"}, TokenType.PONTUACAO_DOIS_PONTOS);
         add(new String[]{"(", ")"}, TokenType.PONTUACAO_PARENTESES);
+
+        add(new String[]{"o", "a", "os", "as"}, TokenType.DESCARTE);
     }
 
     private static void add(String[] palavras, TokenType tipo) {
