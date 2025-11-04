@@ -3,6 +3,7 @@ package br.com.analisador;
 import br.com.palavras_reservadas.PalavrasReservadas;
 import br.com.token.Token;
 import br.com.token.TokenType;
+import br.com.utils.TabelaCaracteresValidos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -132,14 +133,7 @@ public class AnalisadorLexico {
         }
 
         // Lê letras, números e acentos
-        while (caractereAtual != '\0' && (Character.isLetterOrDigit(caractereAtual) ||
-                caractereAtual == 'á' || caractereAtual == 'à' || caractereAtual == 'â' || caractereAtual == 'ã' ||
-                caractereAtual == 'é' || caractereAtual == 'ê' ||
-                caractereAtual == 'í' ||
-                caractereAtual == 'ó' || caractereAtual == 'ô' || caractereAtual == 'õ' ||
-                caractereAtual == 'ú' ||
-                caractereAtual == 'ç' ||
-                caractereAtual == '_') || caractereAtual == '$') {
+        while (caractereAtual != '\0' && (Character.isLetterOrDigit(caractereAtual) || TabelaCaracteresValidos.contem(caractereAtual))) {
             palavra.append(caractereAtual);
             avancar();
         }
