@@ -41,7 +41,7 @@ public class AnalisadorLexico {
                 token = lerTexto();
             }
             // Palavras-chaves ou identificadores
-            else if (Character.isLetter(caractereAtual) || "áàâãéêíóôõúç".indexOf(caractereAtual) >= 0) {
+            else if (Character.isLetter(caractereAtual) || "áàâãéêíóôõúç".indexOf(caractereAtual) >= 0 || caractereAtual == '$') {
                 token = lerPalavra();
             }
             // Operadores e simbolos
@@ -124,6 +124,12 @@ public class AnalisadorLexico {
     private Token lerPalavra() {
         StringBuilder palavra = new StringBuilder();
 
+        boolean isVariavel = false;
+        if (caractereAtual == '$') {
+            isVariavel = true;
+            avancar();
+        }
+
         // Lê letras, números e acentos
         while (caractereAtual != '\0' && (Character.isLetterOrDigit(caractereAtual) ||
                 caractereAtual == 'á' || caractereAtual == 'à' || caractereAtual == 'â' || caractereAtual == 'ã' ||
@@ -132,12 +138,17 @@ public class AnalisadorLexico {
                 caractereAtual == 'ó' || caractereAtual == 'ô' || caractereAtual == 'õ' ||
                 caractereAtual == 'ú' ||
                 caractereAtual == 'ç' ||
-                caractereAtual == '_')) {
+                caractereAtual == '_') || caractereAtual == '$') {
             palavra.append(caractereAtual);
             avancar();
         }
 
         String palavraString = palavra.toString();
+
+        // Se começar com $ é identificador
+        if (isVariavel) {
+            return new Token(TokenType.IDENTIFICADOR, palavraString);
+        }
 
         // Verifica se é uma palavra-chave
         TokenType tipo = PalavrasReservadas.MAP.get(palavraString.toLowerCase());
@@ -145,8 +156,8 @@ public class AnalisadorLexico {
         if (tipo != null)
             return new Token(tipo, palavraString);
 
-        // Se não for palavra-chave, é um identificador
-        return new Token(TokenType.IDENTIFICADOR, palavraString);
+        // Se não for reconhecido é descarte
+        return new Token(TokenType.DESCARTE, palavraString);
     }
 
     private Token lerOperadorOuSimbolo() {
