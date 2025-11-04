@@ -5,6 +5,9 @@ import br.com.token.Token;
 
 import java.util.List;
 
+// TODO - as variáveis terão $ na frente.
+// TODO - Ajustar a implementação dos tokens de descarte
+
 public class Main {
     public static void main(String[] args) {
 //        ---- Identificou corretamente ----
