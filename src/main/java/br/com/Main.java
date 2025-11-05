@@ -21,7 +21,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         try {
-            List<String> linhasScript = Files.readAllLines(caminhoScript);
+            List<String> linhasScript = Files.readAllLines(caminhoScriptErrors);
 //            linhasScript.forEach(System.out::println);
 
             for (String linha : linhasScript) {

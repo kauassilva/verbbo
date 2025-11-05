@@ -10,7 +10,7 @@ public class TabelaCaracteresValidos {
             'ó', 'ô', 'õ',
             'ú',
             'ç',
-            '_', '$'
+            '_'
     );
 
     public static boolean contem(char letra) {
