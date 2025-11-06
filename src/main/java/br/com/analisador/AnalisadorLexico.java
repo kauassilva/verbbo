@@ -119,12 +119,15 @@ public class AnalisadorLexico {
 
         boolean isVariavel = false;
         if (caractereAtual == '$') {
+            palavra.append(caractereAtual);
             isVariavel = true;
             avancar();
         }
 
-        if (isVariavel && !(Character.isLetter(caractereAtual) || TabelaCaracteresValidos.contem(caractereAtual)) ) {
-            return new Token(TokenType.ERRO_LEXICO, "$");
+        if (isVariavel && !(Character.isLetter(caractereAtual) || TabelaCaracteresValidos.contem(caractereAtual))) {
+            palavra.append(caractereAtual);
+            avancar();
+            return new Token(TokenType.ERRO_LEXICO, palavra.toString());
         }
 
         // Lê letras, números e acentos

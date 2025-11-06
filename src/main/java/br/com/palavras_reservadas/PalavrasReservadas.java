@@ -35,7 +35,7 @@ public class PalavrasReservadas {
         add(new String[]{">=" ,"maior ou igual", "maior igual"}, TokenType.COMPARADOR_MAIOR_IGUAL);
         add(new String[]{"!=" ,"diferente", "diferente de", "não igual"}, TokenType.COMPARADOR_DIFERENTE);
 
-        add(new String[]{"a", "à", "ao", "o", "de", "do", "da"}, TokenType.CONECTOR_RUIDO);
+        add(new String[]{"a", "à", "ao", "o", "de", "do", "da", "um"}, TokenType.CONECTOR_RUIDO);
         add(new String[]{"e"}, TokenType.CONECTOR_E);
         add(new String[]{"ou"}, TokenType.CONECTOR_OU);
         add(new String[]{"para"}, TokenType.CONECTOR_PARA);
