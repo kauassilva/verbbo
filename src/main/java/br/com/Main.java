@@ -20,7 +20,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         try {
-            List<String> linhasScript = Files.readAllLines(caminhoScriptErrors);
+            List<String> linhasScript = Files.readAllLines(caminhoScript);
 
             for (String linha : linhasScript) {
                 try {
