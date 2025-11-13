@@ -12,18 +12,15 @@ public class AnalisadorLexico {
     private final String texto;
     private int posicao;
     private char caractereAtual;
-    private int tokensDescartados;
 
     public AnalisadorLexico(String texto) {
         this.texto = texto;
         this.posicao = 0;
         this.caractereAtual = !texto.isEmpty() ? texto.charAt(0) : '\0';
-        this.tokensDescartados = 0;
     }
 
     public List<Token> analisar() {
         List<Token> tokens = new ArrayList<>();
-        tokensDescartados = 0;
 
         while (caractereAtual != '\0') {
             pularEspacos();
@@ -49,15 +46,12 @@ public class AnalisadorLexico {
             else if (";<>:()=!+-*/".indexOf(caractereAtual) >= 0) {
                 token = lerOperadorOuSimbolo();
             } else {
-                avancar();
-                continue;
+                token = lerErroLexico();
             }
 
-            // Adicionar o token se não for do tipo DESCARTE
-            if (token.getTipo() != TokenType.DESCARTE)
-                tokens.add(token);
-            else
-                tokensDescartados++;
+            // Adiciona o token na lista de tokens
+            tokens.add(token);
+
         }
 
         return tokens;
@@ -68,9 +62,6 @@ public class AnalisadorLexico {
         System.out.println("Script analisado: " + texto);
         System.out.println("Total de tokens encontrados: " + tokens.size());
 
-        if (tokensDescartados > 0) {
-            System.out.println("Tokens descartados (artigos/preposições): " + tokensDescartados);
-        }
 
         System.out.println("\nTokens identificados:");
         System.out.println("-".repeat(60));
@@ -128,8 +119,15 @@ public class AnalisadorLexico {
 
         boolean isVariavel = false;
         if (caractereAtual == '$') {
+            palavra.append(caractereAtual);
             isVariavel = true;
             avancar();
+        }
+
+        if (isVariavel && !(Character.isLetter(caractereAtual) || TabelaCaracteresValidos.contem(caractereAtual))) {
+            palavra.append(caractereAtual);
+            avancar();
+            return new Token(TokenType.ERRO_LEXICO, palavra.toString());
         }
 
         // Lê letras, números e acentos
@@ -142,7 +140,7 @@ public class AnalisadorLexico {
 
         // Se começar com $ é identificador
         if (isVariavel) {
-            return new Token(TokenType.IDENTIFICADOR, palavraString);
+            return new Token(TokenType.DECLARACAO_VARIAVEL, palavraString);
         }
 
         // Verifica se é uma palavra-chave
@@ -151,8 +149,8 @@ public class AnalisadorLexico {
         if (tipo != null)
             return new Token(tipo, palavraString);
 
-        // Se não for reconhecido é descarte
-        return new Token(TokenType.DESCARTE, palavraString);
+        // Se não for reconhecido é um identificador
+        return new Token(TokenType.IDENTIFICADOR, palavraString);
     }
 
     private Token lerOperadorOuSimbolo() {
@@ -183,8 +181,33 @@ public class AnalisadorLexico {
         if (tipo != null)
             return new Token(tipo, simboloString);
 
-        // Se não reconhecer, descarta
-        return new Token(TokenType.DESCARTE, simboloString);
+        // Se não reconhecer é tratado como erro
+        return new Token(TokenType.ERRO_LEXICO, simboloString);
+    }
+
+    private Token lerErroLexico() {
+        StringBuilder erro = new StringBuilder();
+
+        // Continua consumindo caracteres enquanto eles forem "lixo"
+        // Um caractere é "lixo" se ele NÃO for:
+        // - Fim de arquivo
+        // - Espaço em branco (que seria pulado)
+        // - Dígito (que iniciaria lerNumero)
+        // - Aspas (que iniciaria lerTexto)
+        // - Letra/Acento/$ (que iniciaria lerPalavra)
+        // - Operador conhecido (que iniciaria lerOperadorOuSimbolo)
+        while (caractereAtual != '\0' &&
+                !Character.isWhitespace(caractereAtual) &&
+                !Character.isDigit(caractereAtual) &&
+                caractereAtual != '"' &&
+                !(Character.isLetter(caractereAtual) || "áàâãéêíóôõúç".indexOf(caractereAtual) >= 0 || caractereAtual == '$') &&
+                !(";<>:()=!+-*/".indexOf(caractereAtual) >= 0)
+        ) {
+            erro.append(caractereAtual);
+            avancar();
+        }
+
+        return new Token(TokenType.ERRO_LEXICO, erro.toString());
     }
 
     private char espiar() {

@@ -1,4 +1,5 @@
-Crie o numero $x valendo 10 e mostre $x
-Crie o texto $nome valendo "Maria" e mostre $nome
-Crie o numero $preco valendo 29.99 e mostre $preco
-Crie o texto $msg valendo "Olá! Você está aprendendo programação" e exiba $msg
+Crie o numero $x valendo 10 e mostre x
+Crie o texto $nome valendo "Maria" e mostre nome
+Crie o numero $preco valendo 29.99 e mostre preco
+Crie o texto $msg valendo "Olá! Você está aprendendo programação" e exiba msg
+Crie um texto $saudacao valendo "Bem-vindo ao curso!" e Crie um texto $sobre "Sobre como domar cavalos" e mostre saudacao e sobre
