@@ -156,7 +156,6 @@ public class AnalisadorLexico {
     private Token lerOperadorOuSimbolo() {
         char simbolo = caractereAtual;
 
-        // Verificar simbolos compostos
         if (simbolo == '<' && espiar() == '=') {
             avancar();
             avancar();
@@ -173,7 +172,6 @@ public class AnalisadorLexico {
             return new Token(TokenType.COMPARADOR_DIFERENTE, "!=");
         }
 
-        // Simbolos simples
         String simboloString = String.valueOf(simbolo);
         TokenType tipo = PalavrasReservadas.MAP.get(simboloString);
         avancar();
