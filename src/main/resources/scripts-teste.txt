@@ -1,5 +1,23 @@
+Crie o numero $a valendo 5 e Crie o numero $b valendo 7 e crie o numero $c valendo a+b e mostre c
 Crie o numero $x valendo 10 e mostre x
+Crie o numero $idade valendo 25 se idade maior ou igual 18 mostre idade
 Crie o texto $nome valendo "Maria" e mostre nome
 Crie o numero $preco valendo 29.99 e mostre preco
 Crie o texto $msg valendo "Olá! Você está aprendendo programação" e exiba msg
-Crie um texto $saudacao valendo "Bem-vindo ao curso!" e Crie um texto $sobre "Sobre como domar cavalos" e mostre saudacao e sobre
+Crie um texto $saudacao valendo "Bem-vindo ao curso!" e Crie um texto $sobre valendo "Sobre como domar cavalos" e mostre saudacao e sobre
+Crie o numero $a valendo 5 e Crie o numero $b valendo 7 e mostre a + b
+Crie o numero $c valendo 2 e mostre c * 10
+Crie o numero $limite valendo 100 se limite maior que 50 e limite menor que 200 mostre limite
+Crie o numero $idade2 valendo 17 se idade2 maior ou igual 18 mostre idade2
+Crie o numero $total valendo 5 e mostre total e contador
+Crie o numero $x2 valendo 10 se x2 igual 10 mostre x2
+Crie o numero $idade3 valendo 30 se idade3 maior que 18 e idade3 menor que 65 mostre idade3
+Crie o numero $y valendo 4 e mostre y + 3 e mostre y * 2
+Crie o numero $negLiteral valendo -5 e mostre negLiteral
+Crie o numero $a valendo 5 e Crie o numero $negA valendo -a e mostre negA
+Crie o numero $d valendo menos 3 e mostre d
+Crie o numero $p valendo 10 e mostre -p
+Crie o numero $a valendo 2 e crie o numero $b valendo 3 e Crie o numero $sumParen valendo ( a + b ) e mostre sumParen
+mostre -10
+Crie o numero $m1 valendo 2 e Crie o numero $m2 valendo -m1 e mostre m2
+Crie o número $aa valendo 2 e o número $bb valendo 3 e mostre aa e bb

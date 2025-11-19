@@ -13,4 +13,8 @@ public interface Visitor<R> {
     R visitPrintStatement(PrintStatement printStatement);
     R visitLiteral(Literal literal);
     R visitVariable(Variable variable);
+    R visitBinaryExpression(BinaryExpression binaryExpression);
+    R visitUnaryExpression(UnaryExpression unaryExpression);
+    R visitIfStatement(IfStatement ifStatement);
+    R visitSequenceStatement(SequenceStatement sequenceStatement);
 }

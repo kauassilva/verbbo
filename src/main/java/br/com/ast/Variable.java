@@ -8,7 +8,6 @@ public record Variable(String name) implements Expression {
 
     @Override
     public TokenType getType() {
-        // O tipo real da variável será determinado durante a análise semântica
         return TokenType.IDENTIFICADOR;
     }
 

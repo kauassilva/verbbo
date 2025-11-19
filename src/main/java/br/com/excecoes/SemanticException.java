@@ -1,4 +1,4 @@
-package br.com.exception;
+package br.com.excecoes;
 
 public class SemanticException extends Exception {
     public SemanticException(String message) {

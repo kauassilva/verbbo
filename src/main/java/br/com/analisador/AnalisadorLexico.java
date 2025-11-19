@@ -7,6 +7,7 @@ import br.com.utils.TabelaCaracteresValidos;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class AnalisadorLexico {
     private final String texto;
@@ -125,8 +126,16 @@ public class AnalisadorLexico {
         }
 
         if (isVariavel && !(Character.isLetter(caractereAtual) || TabelaCaracteresValidos.contem(caractereAtual))) {
-            palavra.append(caractereAtual);
-            avancar();
+            StringBuilder invalidos = new StringBuilder();
+            while (caractereAtual != '\0' &&
+                    !Character.isWhitespace(caractereAtual) &&
+                    !(Character.isLetterOrDigit(caractereAtual) || TabelaCaracteresValidos.contem(caractereAtual)) &&
+                    !(";<>:()=!+-*/\"".indexOf(caractereAtual) >= 0)
+            ) {
+                invalidos.append(caractereAtual);
+                avancar();
+            }
+            palavra.append(invalidos);
             return new Token(TokenType.ERRO_LEXICO, palavra.toString());
         }
 
@@ -138,19 +147,21 @@ public class AnalisadorLexico {
 
         String palavraString = palavra.toString();
 
-        // Se começar com $ é identificador
         if (isVariavel) {
             return new Token(TokenType.DECLARACAO_VARIAVEL, palavraString);
         }
 
-        // Verifica se é uma palavra-chave
+        //tenta combinar palavras compostas (ex: "maior ou igual", "para o", etc)
+        Token tokenComposto = tentarCombinarPalavrasCompostas(palavraString);
+        if (tokenComposto != null) {
+            return tokenComposto;
+        }
+
+        //se não for composta, busca palavra simples no mapa
         TokenType tipo = PalavrasReservadas.MAP.get(palavraString.toLowerCase());
 
-        if (tipo != null)
-            return new Token(tipo, palavraString);
+        return new Token(Objects.requireNonNullElse(tipo, TokenType.IDENTIFICADOR), palavraString);
 
-        // Se não for reconhecido é um identificador
-        return new Token(TokenType.IDENTIFICADOR, palavraString);
     }
 
     private Token lerOperadorOuSimbolo() {
@@ -176,11 +187,9 @@ public class AnalisadorLexico {
         TokenType tipo = PalavrasReservadas.MAP.get(simboloString);
         avancar();
 
-        if (tipo != null)
-            return new Token(tipo, simboloString);
+        return new Token(Objects.requireNonNullElse(tipo, TokenType.ERRO_LEXICO), simboloString);
 
         // Se não reconhecer é tratado como erro
-        return new Token(TokenType.ERRO_LEXICO, simboloString);
     }
 
     private Token lerErroLexico() {
@@ -215,5 +224,100 @@ public class AnalisadorLexico {
             return texto.charAt(proximaPosicao);
 
         return '\0';
+    }
+
+    private Token tentarCombinarPalavrasCompostas(String palavraInicial) {
+        String lower = palavraInicial.toLowerCase();
+        if (lower.equals("maior") || lower.equals("menor")) {
+            Token tokenComposto = tentarCombinarComparador(palavraInicial);
+            if (tokenComposto != null) return tokenComposto;
+        }
+
+        return tentarCombinarAte2Palavras(palavraInicial);
+    }
+
+
+    private Token tentarCombinarComparador(String palavraInicial) {
+        int tempPos = posicao;
+
+        String palavra1 = lerProximaPalavra(tempPos);
+        if (palavra1 == null || !palavra1.equalsIgnoreCase("ou")) return null;
+
+        tempPos = proximaPosicaoAposLeitura(tempPos, palavra1);
+        String palavra2 = lerProximaPalavra(tempPos);
+        if (palavra2 == null) return null;
+
+        tempPos = proximaPosicaoAposLeitura(tempPos, palavra2);
+        String combined = palavraInicial + " " + palavra1 + " " + palavra2;
+        TokenType tipo = PalavrasReservadas.MAP.get(combined.toLowerCase());
+
+        if (tipo != null) {
+            while (posicao < tempPos) avancar();
+            return new Token(tipo, combined);
+        }
+
+        return null;
+    }
+
+
+    private Token tentarCombinarAte2Palavras(String palavraInicial) {
+        StringBuilder combined = new StringBuilder(palavraInicial);
+        int tempPos = posicao;
+
+        for (int i = 0; i < 2; i++) {
+            String proximaPalavra = lerProximaPalavra(tempPos);
+            if (proximaPalavra == null) break;
+
+            tempPos = proximaPosicaoAposLeitura(tempPos, proximaPalavra);
+            combined.append(" ").append(proximaPalavra);
+
+            TokenType tipo = PalavrasReservadas.MAP.get(combined.toString().toLowerCase());
+            if (tipo != null) {
+                while (posicao < tempPos) avancar();
+                return new Token(tipo, combined.toString());
+            }
+        }
+
+        return null;
+    }
+
+    private String lerProximaPalavra(int startPos) {
+        int tempPos = startPos;
+
+        while (tempPos < texto.length() && Character.isWhitespace(texto.charAt(tempPos))) {
+            tempPos++;
+        }
+
+        if (tempPos >= texto.length()) return null;
+
+        char tempChar = texto.charAt(tempPos);
+        if (!(Character.isLetter(tempChar) || "áàâãéêíóôõúç".indexOf(tempChar) >= 0)) {
+            return null;
+        }
+
+        StringBuilder palavra = new StringBuilder();
+        while (tempPos < texto.length()) {
+            tempChar = texto.charAt(tempPos);
+            if (Character.isLetterOrDigit(tempChar) || TabelaCaracteresValidos.contem(tempChar)) {
+                palavra.append(tempChar);
+                tempPos++;
+            } else {
+                break;
+            }
+        }
+
+        return palavra.isEmpty() ? null : palavra.toString();
+    }
+
+    private int proximaPosicaoAposLeitura(int startPos, String palavra) {
+        int tempPos = startPos;
+
+        while (tempPos < texto.length() && Character.isWhitespace(texto.charAt(tempPos))) {
+            tempPos++;
+        }
+
+        tempPos += palavra.length();
+
+        return tempPos;
     }
 }

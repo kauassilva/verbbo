@@ -3,7 +3,7 @@ package br.com.analisador;
 import br.com.ast.*;
 import br.com.ast.interfaces.Expression;
 import br.com.ast.interfaces.Statement;
-import br.com.exception.SemanticException;
+import br.com.excecoes.SemanticException;
 import br.com.token.TokenType;
 import br.com.utils.Simbolo;
 import br.com.utils.TabelaSimbolos;
