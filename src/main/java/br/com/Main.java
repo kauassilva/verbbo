@@ -1,6 +1,7 @@
 package br.com;
 
 import br.com.analisador.AnalisadorLexico;
+import br.com.analisador.AnalisadorSemantico;
 import br.com.analisador.AnalisadorSintatico;
 import br.com.ast.Program;
 import br.com.token.Token;
@@ -33,6 +34,10 @@ public class Main {
                     AnalisadorSintatico analisadorSintatico = new AnalisadorSintatico(tokens);
                     Program programa = analisadorSintatico.parse();
                     analisadorSintatico.exibirPrograma(programa);
+
+                    // Análise semântica
+                    AnalisadorSemantico analisadorSemantico = new AnalisadorSemantico();
+                    analisadorSemantico.analisar(programa);
 
                 } catch (Exception e) {
                     System.out.println("\nErro de sintaxe: " + e.getMessage());
