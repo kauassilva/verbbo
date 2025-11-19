@@ -1,6 +1,6 @@
 package br.com.analisador;
 
-import br.com.palavras_reservadas.PalavrasReservadas;
+import br.com.utils.PalavrasReservadas;
 import br.com.token.Token;
 import br.com.token.TokenType;
 import br.com.utils.TabelaCaracteresValidos;

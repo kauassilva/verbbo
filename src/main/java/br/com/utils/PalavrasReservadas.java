@@ -1,4 +1,4 @@
-package br.com.palavras_reservadas;
+package br.com.utils;
 
 import br.com.token.TokenType;
 
