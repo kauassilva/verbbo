@@ -17,4 +17,7 @@ public interface Visitor<R> {
     R visitUnaryExpression(UnaryExpression unaryExpression);
     R visitIfStatement(IfStatement ifStatement);
     R visitSequenceStatement(SequenceStatement sequenceStatement);
+    R visitAssignment(Assignment assignment);
+    R visitWhileStatement(WhileStatement whileStatement);
+    R visitBlockStatement(BlockStatement blockStatement);
 }
