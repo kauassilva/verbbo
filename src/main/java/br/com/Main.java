@@ -19,11 +19,12 @@ public class Main {
     public static void main(String[] args) {
         Path caminhoScript = Paths.get("src/main/resources/scripts-teste.txt");
         Path caminhoScriptErrors = Paths.get("src/main/resources/script-errors.txt");
+        Path scriptSemantico = Paths.get("src/main/resources/script-semantico.txt");
 
         Scanner scanner = new Scanner(System.in);
 
         try {
-            List<String> linhasScript = Files.readAllLines(caminhoScript);
+            List<String> linhasScript = Files.readAllLines(scriptSemantico);
 
             for (String linha : linhasScript) {
                 try {
