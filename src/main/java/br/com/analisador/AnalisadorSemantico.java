@@ -23,29 +23,20 @@ public class AnalisadorSemantico {
         this.variaveisUsadasAntesDeclaracao = new HashSet<>();
     }
 
-    /**
-     * Analisa o programa completo
-     */
     public void analisar(Program program) throws SemanticException {
         System.out.println("\n=== ANÁLISE SEMÂNTICA ===");
 
-        // Primeira passagem: coleta todas as declarações
-        Set<String> variaveisDeclaradas = new HashSet<>();
-        for (Statement stmt : program.statements()) {
-            if (stmt instanceof Declaration) {
-                variaveisDeclaradas.add(((Declaration) stmt).nome());
-            }
-        }
+        // Primeira passagem: coleta declarações
+        Set<String> variaveisDeclaradas = coletarDeclaracoes(program.statements());
 
         // Segunda passagem: valida statements
         for (Statement stmt : program.statements()) {
             analisarStatement(stmt, variaveisDeclaradas);
         }
 
-        // Exibe a tabela de símbolos
         tabelaSimbolos.printScopes();
 
-        // Relatório de erros
+//        TODO - Resolver o erro do System.err com buffer diferente
         if (!erros.isEmpty()) {
             System.err.println("\n" + "=".repeat(60));
             System.err.println("ERROS SEMÂNTICOS ENCONTRADOS: " + erros.size());
@@ -58,93 +49,194 @@ public class AnalisadorSemantico {
         }
 
         System.out.println("Análise semântica concluída com sucesso!");
-        System.out.println("   • Variáveis declaradas: " + variaveisDeclaradas.size());
-        System.out.println("   • Sem erros detectados");
+        System.out.println(" - Variáveis declaradas: " + variaveisDeclaradas.size());
+        System.out.println(" - Sem erros detectados");
     }
 
-    /**
-     * Analisa um statement
-     */
-    private void analisarStatement(Statement stmt, Set<String> todasVariaveis) {
-        if (stmt instanceof Declaration) {
-            analisarDeclaration((Declaration) stmt);
-        } else if (stmt instanceof PrintStatement) {
-            analisarPrintStatement((PrintStatement) stmt, todasVariaveis);
+    private Set<String> coletarDeclaracoes(List<Statement> statements) {
+        Set<String> vars = new HashSet<>();
+        for (Statement stmt : statements) {
+            if (stmt instanceof Declaration decl) {
+                vars.add(decl.nome());
+            } else if (stmt instanceof SequenceStatement seq) {
+                vars.addAll(coletarDeclaracoes(seq.statements()));
+            } else if (stmt instanceof IfStatement ifStmt) {
+                vars.addAll(coletarDeclaracoes(List.of(ifStmt.thenCondition())));
+                if (ifStmt.elseCondition() != null) {
+                    vars.addAll(coletarDeclaracoes(List.of(ifStmt.elseCondition())));
+                }
+            } else if (stmt instanceof WhileStatement whileStmt) {
+                vars.addAll(coletarDeclaracoes(whileStmt.body()));
+            } else if (stmt instanceof BlockStatement block) {
+                vars.addAll(coletarDeclaracoes(block.statements()));
+            }
         }
-        // Adicione outros tipos de statement conforme necessário
+        return vars;
     }
 
-    /**
-     * Analisa declaração de variável
-     */
+    private void analisarStatement(Statement stmt, Set<String> todasVariaveis) {
+        if (stmt instanceof Declaration decl) {
+            analisarDeclaration(decl);
+        } else if (stmt instanceof PrintStatement print) {
+            analisarPrintStatement(print, todasVariaveis);
+        } else if (stmt instanceof Assignment assign) {
+            analisarAssignment(assign);
+        } else if (stmt instanceof IfStatement ifStmt) {
+            analisarIfStatement(ifStmt, todasVariaveis);
+        } else if (stmt instanceof WhileStatement whileStmt) {
+            analisarWhileStatement(whileStmt, todasVariaveis);
+        } else if (stmt instanceof BlockStatement block) {
+            analisarBlockStatement(block, todasVariaveis);
+        } else if (stmt instanceof SequenceStatement seq) {
+            analisarSequenceStatement(seq, todasVariaveis);
+        }
+    }
+
     private void analisarDeclaration(Declaration decl) {
         String nomeVar = decl.nome();
         TokenType tipoVar = decl.tipo();
 
-        // 1. Verifica se variável já foi declarada no escopo atual
         if (tabelaSimbolos.existsInCurrentScope(nomeVar)) {
             erros.add(String.format(
-                    "Redeclaração de variável: '%s' já foi declarada neste escopo",
-                    nomeVar
+                    "Redeclaração de variável: '%s' já foi declarada neste escopo", nomeVar
             ));
             return;
         }
 
-        // 2. Analisa a expressão de inicialização
         TokenType tipoExpressao = inferirTipo(decl.inicializador());
 
-        // 3. Verifica se houve erro na inferência
         if (tipoExpressao == TokenType.ERRO_LEXICO) {
-            // Erro já foi adicionado em inferirTipo()
             return;
         }
 
-        // 4. Verifica compatibilidade de tipos
         if (!tiposCompativeis(tipoVar, tipoExpressao)) {
             erros.add(String.format(
                     "Incompatibilidade de tipos: variável '%s' é do tipo '%s' mas recebeu valor do tipo '%s'",
-                    nomeVar,
-                    tipoParaString(tipoVar),
-                    tipoParaString(tipoExpressao)
+                    nomeVar, tipoParaString(tipoVar), tipoParaString(tipoExpressao)
             ));
             return;
         }
 
-        // 5. Extrai o valor do inicializador
-        Object valorInicial = extrairValor(decl.inicializador());
+        // Verifica se é um literal direto ou expressão computada
+        boolean isLiteralDireto = decl.inicializador() instanceof Literal;
+        Object valorInicial = isLiteralDireto ? extrairValor(decl.inicializador()) : null;
 
-        // 6. Adiciona variável na tabela de símbolos com valor
-        Simbolo simbolo = new Simbolo(nomeVar, tipoVar, valorInicial);
+        Simbolo simbolo;
+        if (isLiteralDireto) {
+            // Literal direto: valor conhecido e inicializada=true
+            simbolo = new Simbolo(nomeVar, tipoVar, valorInicial);
+        } else {
+            // Expressão computada: valor null e inicializada=false
+            simbolo = new Simbolo(nomeVar, tipoVar);
+        }
+
         tabelaSimbolos.declare(nomeVar, simbolo);
 
-        System.out.printf("Declarada: %-15s : %-10s = %s%n",
+        System.out.printf("Declarada: %-15s : %-10s = %s%s%n",
                 nomeVar,
                 tipoParaString(tipoVar),
-                formatarValor(valorInicial)
+                formatarValor(valorInicial),
+                isLiteralDireto ? "" : " (expressão computada)"
         );
     }
 
-    /**
-     * Analisa statement de impressão
-     */
+    private void analisarAssignment(Assignment assign) {
+        String nomeVar = assign.name();
+
+        if (!tabelaSimbolos.exists(nomeVar)) {
+            erros.add(String.format("Variável '%s' não foi declarada", nomeVar));
+            return;
+        }
+
+        Simbolo simbolo = tabelaSimbolos.lookup(nomeVar);
+        TokenType tipoVar = simbolo.getTipoVariavel();
+        TokenType tipoValor = inferirTipo(assign.value());
+
+        if (!tiposCompativeis(tipoVar, tipoValor)) {
+            erros.add(String.format(
+                    "Incompatibilidade na atribuição: '%s' é do tipo '%s' mas recebeu '%s'",
+                    nomeVar, tipoParaString(tipoVar), tipoParaString(tipoValor)
+            ));
+            return;
+        }
+
+        System.out.printf("Atribuição válida: %s = ... (tipo: %s)%n",
+                nomeVar, tipoParaString(tipoVar)
+        );
+    }
+
+    private void analisarIfStatement(IfStatement ifStmt, Set<String> todasVariaveis) {
+        TokenType tipoCondicao = inferirTipo(ifStmt.condition());
+
+        if (tipoCondicao != TokenType.TIPO_BOOLEANO && tipoCondicao != TokenType.ERRO_LEXICO) {
+            erros.add(String.format(
+                    "Condição do 'se' deve ser booleana, mas é do tipo '%s'",
+                    tipoParaString(tipoCondicao)
+            ));
+        }
+
+        System.out.println("Analisando bloco 'se'");
+
+        tabelaSimbolos.pushScope();
+        analisarStatement(ifStmt.thenCondition(), todasVariaveis);
+        tabelaSimbolos.popScope();
+
+        if (ifStmt.elseCondition() != null) {
+            System.out.println("Analisando bloco 'senão'");
+            tabelaSimbolos.pushScope();
+            analisarStatement(ifStmt.elseCondition(), todasVariaveis);
+            tabelaSimbolos.popScope();
+        }
+    }
+
+    private void analisarWhileStatement(WhileStatement whileStmt, Set<String> todasVariaveis) {
+        TokenType tipoCondicao = inferirTipo(whileStmt.condition());
+
+        if (tipoCondicao != TokenType.TIPO_BOOLEANO && tipoCondicao != TokenType.ERRO_LEXICO) {
+            erros.add(String.format(
+                    "Condição do 'enquanto' deve ser booleana, mas é do tipo '%s'",
+                    tipoParaString(tipoCondicao)
+            ));
+        }
+
+        System.out.println("Analisando bloco 'enquanto'");
+
+        tabelaSimbolos.pushScope();
+        for (Statement stmt : whileStmt.body()) {
+            analisarStatement(stmt, todasVariaveis);
+        }
+        tabelaSimbolos.popScope();
+    }
+
+    private void analisarBlockStatement(BlockStatement block, Set<String> todasVariaveis) {
+        tabelaSimbolos.pushScope();
+        for (Statement stmt : block.statements()) {
+            analisarStatement(stmt, todasVariaveis);
+        }
+        tabelaSimbolos.popScope();
+    }
+
+    private void analisarSequenceStatement(SequenceStatement seq, Set<String> todasVariaveis) {
+        for (Statement stmt : seq.statements()) {
+            analisarStatement(stmt, todasVariaveis);
+        }
+    }
+
     private void analisarPrintStatement(PrintStatement print, Set<String> todasVariaveis) {
         Expression expr = print.expression();
 
-        if (expr instanceof Variable(String name)) {
+        if (expr instanceof Variable var) {
+            String name = var.name();
 
-            // Verifica se variável foi declarada
             if (!tabelaSimbolos.exists(name)) {
-                // Verifica se será declarada depois
                 if (todasVariaveis.contains(name) && !variaveisUsadasAntesDeclaracao.contains(name)) {
                     erros.add(String.format(
-                            "Uso antes da declaração: variável '%s' é usada antes de ser declarada",
-                            name
+                            "Uso antes da declaração: variável '%s' é usada antes de ser declarada", name
                     ));
                     variaveisUsadasAntesDeclaracao.add(name);
                 } else if (!todasVariaveis.contains(name)) {
                     erros.add(String.format(
-                            "Variável não declarada: '%s' não foi declarada em nenhum lugar",
-                            name
+                            "Variável não declarada: '%s' não foi declarada em nenhum lugar", name
                     ));
                 }
                 return;
@@ -152,15 +244,14 @@ public class AnalisadorSemantico {
 
             Simbolo simbolo = tabelaSimbolos.lookup(name);
             System.out.printf("Uso válido: %-15s (tipo: %s)%n",
-                    name,
-                    tipoParaString(simbolo.getTipoVariavel())
+                    name, tipoParaString(simbolo.getTipoVariavel())
             );
+        } else {
+            // Se não for variável, apenas verifica o tipo da expressão
+            inferirTipo(expr);
         }
     }
 
-    /**
-     * Infere o tipo de uma expressão
-     */
     private TokenType inferirTipo(Expression expr) {
         if (expr instanceof Literal literal) {
             Object value = literal.getValue();
@@ -172,31 +263,111 @@ public class AnalisadorSemantico {
             } else if (value instanceof Boolean) {
                 return TokenType.TIPO_BOOLEANO;
             }
-        } else if (expr instanceof Variable(String name)) {
-            Simbolo simbolo = tabelaSimbolos.lookup(name);
+        } else if (expr instanceof Variable var) {
+            Simbolo simbolo = tabelaSimbolos.lookup(var.name());
 
             if (simbolo == null) {
                 erros.add(String.format(
-                        "Variável não declarada: '%s' usada na inicialização não existe",
-                        name
+                        "Variável não declarada: '%s' usada na expressão não existe", var.name()
                 ));
                 return TokenType.ERRO_LEXICO;
             }
 
             return simbolo.getTipoVariavel();
+        } else if (expr instanceof BinaryExpression binExpr) {
+            return analisarBinaryExpression(binExpr);
+        } else if (expr instanceof UnaryExpression unExpr) {
+            return analisarUnaryExpression(unExpr);
         }
 
         return TokenType.ERRO_LEXICO;
     }
 
-    /**
-     * Extrai o valor de uma expressão
-     */
+    private TokenType analisarBinaryExpression(BinaryExpression binExpr) {
+        TokenType tipoEsq = inferirTipo(binExpr.left());
+        TokenType tipoDir = inferirTipo(binExpr.right());
+        TokenType operador = binExpr.operator().getTipo();
+
+        // Operações aritméticas: +, -, *, /
+        if (operador == TokenType.VERBO_SOMAR || operador == TokenType.VERBO_SUBTRAIR ||
+                operador == TokenType.VERBO_MULTIPLICAR || operador == TokenType.VERBO_DIVIDIR) {
+
+            if (tipoEsq != TokenType.TIPO_NUMERICO) {
+                erros.add(String.format(
+                        "Operação aritmética requer números: lado esquerdo é '%s'",
+                        tipoParaString(tipoEsq)
+                ));
+                return TokenType.ERRO_LEXICO;
+            }
+
+            if (tipoDir != TokenType.TIPO_NUMERICO) {
+                erros.add(String.format(
+                        "Operação aritmética requer números: lado direito é '%s'",
+                        tipoParaString(tipoDir)
+                ));
+                return TokenType.ERRO_LEXICO;
+            }
+
+            System.out.printf("Operação aritmética válida: %s%n",
+                    operadorParaString(operador));
+            return TokenType.TIPO_NUMERICO;
+        }
+
+        // Comparações: <, >, <=, >=, ==, !=
+        if (operador == TokenType.COMPARADOR_MENOR || operador == TokenType.COMPARADOR_MAIOR ||
+                operador == TokenType.COMPARADOR_MENOR_IGUAL || operador == TokenType.COMPARADOR_MAIOR_IGUAL ||
+                operador == TokenType.COMPARADOR_IGUAL || operador == TokenType.COMPARADOR_DIFERENTE) {
+
+            if (tipoEsq != tipoDir) {
+                erros.add(String.format(
+                        "Comparação entre tipos diferentes: '%s' e '%s'",
+                        tipoParaString(tipoEsq), tipoParaString(tipoDir)
+                ));
+                return TokenType.ERRO_LEXICO;
+            }
+
+            System.out.printf("Comparação válida: %s entre %s%n",
+                    operadorParaString(operador), tipoParaString(tipoEsq));
+            return TokenType.TIPO_BOOLEANO;
+        }
+
+        // Operadores lógicos: e, ou
+        if (operador == TokenType.CONECTOR_E || operador == TokenType.CONECTOR_OU) {
+            if (tipoEsq != TokenType.TIPO_BOOLEANO || tipoDir != TokenType.TIPO_BOOLEANO) {
+                erros.add(String.format(
+                        "Operadores lógicos requerem booleanos: recebeu '%s' e '%s'",
+                        tipoParaString(tipoEsq), tipoParaString(tipoDir)
+                ));
+                return TokenType.ERRO_LEXICO;
+            }
+
+            System.out.printf("Operação lógica válida: %s%n",
+                    operadorParaString(operador));
+            return TokenType.TIPO_BOOLEANO;
+        }
+
+        return TokenType.ERRO_LEXICO;
+    }
+
+    private TokenType analisarUnaryExpression(UnaryExpression unExpr) {
+        TokenType tipoOperando = inferirTipo(unExpr.right());
+
+        if (unExpr.operator().getTipo() == TokenType.VERBO_SUBTRAIR) {
+            if (tipoOperando != TokenType.TIPO_NUMERICO) {
+                erros.add("Operador '-' unário requer número");
+                return TokenType.ERRO_LEXICO;
+            }
+            return TokenType.TIPO_NUMERICO;
+        }
+
+        return tipoOperando;
+    }
+
     private Object extrairValor(Expression expr) {
-        if (expr instanceof Literal) {
-            return ((Literal) expr).getValue();
-        } else if (expr instanceof Variable(String name)) {
-            Simbolo simbolo = tabelaSimbolos.lookup(name);
+        if (expr instanceof Literal literal) {
+            return literal.getValue();
+        } else if (expr instanceof Variable var) {
+            Simbolo simbolo = tabelaSimbolos.lookup(var.name());
             if (simbolo != null) {
                 return simbolo.getValor();
             }
@@ -204,38 +375,41 @@ public class AnalisadorSemantico {
         return null;
     }
 
-    /**
-     * Formata um valor para exibição
-     */
     private String formatarValor(Object valor) {
-        if (valor == null) {
-            return "null";
-        }
-        if (valor instanceof String) {
-            return "\"" + valor + "\"";
-        }
+        if (valor == null) return "null";
+        if (valor instanceof String) return "\"" + valor + "\"";
         return valor.toString();
     }
 
-    /**
-     * Verifica compatibilidade entre tipos
-     */
     private boolean tiposCompativeis(TokenType tipoEsperado, TokenType tipoRecebido) {
-        if (tipoRecebido == TokenType.ERRO_LEXICO) {
-            return false;
-        }
+        if (tipoRecebido == TokenType.ERRO_LEXICO) return false;
         return tipoEsperado == tipoRecebido;
     }
 
-    /**
-     * Converte TokenType para string legível
-     */
     private String tipoParaString(TokenType tipo) {
         return switch (tipo) {
             case TIPO_NUMERICO -> "número";
             case TIPO_TEXTO -> "texto";
             case TIPO_BOOLEANO -> "booleano";
             default -> "desconhecido";
+        };
+    }
+
+    private String operadorParaString(TokenType op) {
+        return switch (op) {
+            case VERBO_SOMAR -> "soma (+)";
+            case VERBO_SUBTRAIR -> "subtração (-)";
+            case VERBO_MULTIPLICAR -> "multiplicação (*)";
+            case VERBO_DIVIDIR -> "divisão (/)";
+            case COMPARADOR_MENOR -> "menor que (<)";
+            case COMPARADOR_MAIOR -> "maior que (>)";
+            case COMPARADOR_MENOR_IGUAL -> "menor ou igual (<=)";
+            case COMPARADOR_MAIOR_IGUAL -> "maior ou igual (>=)";
+            case COMPARADOR_IGUAL -> "igual (==)";
+            case COMPARADOR_DIFERENTE -> "diferente (!=)";
+            case CONECTOR_E -> "E lógico (&&)";
+            case CONECTOR_OU -> "OU lógico (||)";
+            default -> op.toString();
         };
     }
 

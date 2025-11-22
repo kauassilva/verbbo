@@ -4,7 +4,9 @@ import br.com.analisador.AnalisadorLexico;
 import br.com.analisador.AnalisadorSemantico;
 import br.com.analisador.AnalisadorSintatico;
 import br.com.ast.Program;
+import br.com.codegen.JavaCodeGenerator;
 import br.com.token.Token;
+import br.com.utils.TabelaSimbolos;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,6 +19,7 @@ public class Main {
     public static void main(String[] args) {
         Path caminhoScript = Paths.get("src/main/resources/scripts-teste.txt");
         Path caminhoScriptErrors = Paths.get("src/main/resources/script-errors.txt");
+        Path scriptSemantico = Paths.get("src/main/resources/script-semantico.txt");
 
         Scanner scanner = new Scanner(System.in);
 
@@ -25,6 +28,12 @@ public class Main {
 
             for (String linha : linhasScript) {
                 try {
+                    // Pula linhas vazias ou comentadas (começando com //)
+                    String linhaTrim = linha == null ? "" : linha.trim();
+                    if (linhaTrim.isEmpty() || linhaTrim.startsWith("//")) {
+                        continue;
+                    }
+
                     // Análise léxica
                     AnalisadorLexico analisadorLexico = new AnalisadorLexico(linha);
                     List<Token> tokens = analisadorLexico.analisar();
@@ -38,7 +47,15 @@ public class Main {
                     // Análise semântica
                     AnalisadorSemantico analisadorSemantico = new AnalisadorSemantico();
                     analisadorSemantico.analisar(programa);
+                    TabelaSimbolos tabelaSimbolos = analisadorSemantico.getTabelaSimbolos();
 
+                    String className = "AppGenerated";
+                    String pathToClass = "target/generated/";
+
+                    JavaCodeGenerator gen = new JavaCodeGenerator(className, pathToClass);
+                    String source = gen.generateToString(programa, tabelaSimbolos);
+                    gen.exibirCodigo(source);
+                    gen.writeJavaFile(programa, tabelaSimbolos);
                 } catch (Exception e) {
                     System.out.println("\nErro de sintaxe: " + e.getMessage());
                 }
