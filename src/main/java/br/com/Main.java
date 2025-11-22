@@ -4,7 +4,9 @@ import br.com.analisador.AnalisadorLexico;
 import br.com.analisador.AnalisadorSemantico;
 import br.com.analisador.AnalisadorSintatico;
 import br.com.ast.Program;
+import br.com.codegen.JavaCodeGenerator;
 import br.com.token.Token;
+import br.com.utils.TabelaSimbolos;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,7 +40,15 @@ public class Main {
                     // Análise semântica
                     AnalisadorSemantico analisadorSemantico = new AnalisadorSemantico();
                     analisadorSemantico.analisar(programa);
+                    TabelaSimbolos tabelaSimbolos = analisadorSemantico.getTabelaSimbolos();
 
+                    String className = "Main";
+                    String pathToClass = "target/generated/";
+
+                    JavaCodeGenerator gen = new JavaCodeGenerator(className, pathToClass);
+                    String source = gen.generateToString(programa, tabelaSimbolos);
+                    gen.exibirCodigo(source);
+                    gen.writeJavaFile(programa, tabelaSimbolos);
                 } catch (Exception e) {
                     System.out.println("\nErro de sintaxe: " + e.getMessage());
                 }
