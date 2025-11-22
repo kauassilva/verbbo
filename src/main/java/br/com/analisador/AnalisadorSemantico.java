@@ -36,6 +36,7 @@ public class AnalisadorSemantico {
 
         tabelaSimbolos.printScopes();
 
+//        TODO - Resolver o erro do System.err com buffer diferente
         if (!erros.isEmpty()) {
             System.err.println("\n" + "=".repeat(60));
             System.err.println("ERROS SEMÂNTICOS ENCONTRADOS: " + erros.size());

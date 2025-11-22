@@ -102,6 +102,21 @@ public class JavaCodeGenVisitor implements Visitor<Void> {
         return null;
     }
 
+    @Override
+    public Void visitAssignment(Assignment assignment) {
+        return null;
+    }
+
+    @Override
+    public Void visitWhileStatement(WhileStatement whileStatement) {
+        return null;
+    }
+
+    @Override
+    public Void visitBlockStatement(BlockStatement blockStatement) {
+        return null;
+    }
+
     // helper methods
     private String emitExpression(Expression expr) {
         if (expr instanceof Literal) {

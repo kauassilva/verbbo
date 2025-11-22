@@ -24,10 +24,16 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         try {
-            List<String> linhasScript = Files.readAllLines(scriptSemantico);
+            List<String> linhasScript = Files.readAllLines(caminhoScript);
 
             for (String linha : linhasScript) {
                 try {
+                    // Pula linhas vazias ou comentadas (começando com //)
+                    String linhaTrim = linha == null ? "" : linha.trim();
+                    if (linhaTrim.isEmpty() || linhaTrim.startsWith("//")) {
+                        continue;
+                    }
+
                     // Análise léxica
                     AnalisadorLexico analisadorLexico = new AnalisadorLexico(linha);
                     List<Token> tokens = analisadorLexico.analisar();
@@ -43,7 +49,7 @@ public class Main {
                     analisadorSemantico.analisar(programa);
                     TabelaSimbolos tabelaSimbolos = analisadorSemantico.getTabelaSimbolos();
 
-                    String className = "Main";
+                    String className = "AppGenerated";
                     String pathToClass = "target/generated/";
 
                     JavaCodeGenerator gen = new JavaCodeGenerator(className, pathToClass);
