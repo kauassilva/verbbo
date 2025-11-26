@@ -36,8 +36,13 @@ public class Main {
 
             Scanner console = new Scanner(System.in);
             System.out.println("------------------------------------------------");
+
             System.out.print(">>> Digite o nome do arquivo/classe que será gerado (ex: MinhaClasse): ");
             String nomeClasseUsuario = console.nextLine().trim();
+
+            System.out.print(">>> Deseja habilitar o modo debug? (o processo de compilação será exibido) [y/n]: ");
+            String debugInput = console.nextLine().trim();
+            boolean debugMode = debugInput.equalsIgnoreCase("y");
 
             if (!nomeClasseUsuario.isEmpty()) {
                 nomeClasseUsuario = nomeClasseUsuario.substring(0, 1).toUpperCase() + nomeClasseUsuario.substring(1);
@@ -47,7 +52,7 @@ public class Main {
 
             System.out.println(">>> Processando arquivo fonte: " + arquivoFonte.getName());
 
-            boolean sucesso = processarCompilacao(arquivoFonte, nomeClasseUsuario);
+            boolean sucesso = processarCompilacao(arquivoFonte, nomeClasseUsuario, debugMode);
 
             if (sucesso) {
                 executarELimpar(nomeClasseUsuario);
@@ -58,19 +63,31 @@ public class Main {
         }
     }
 
-    private static boolean processarCompilacao(File arquivo, String className) throws IOException {
+    private static boolean processarCompilacao(File arquivo, String className, boolean debugMode) throws IOException {
         String codigoFonte = Files.readString(arquivo.toPath());
 
         try {
             AnalisadorLexico lexico = new AnalisadorLexico(codigoFonte);
             List<Token> tokens = lexico.analisar();
 
+            if (debugMode) {
+                lexico.exibirTokens(tokens);
+            }
+
             AnalisadorSintatico sintatico = new AnalisadorSintatico(tokens);
             Program programa = sintatico.parse();
 
-            AnalisadorSemantico semantico = new AnalisadorSemantico();
+            if (debugMode) {
+                sintatico.exibirPrograma(programa);
+            }
+
+            AnalisadorSemantico semantico = new AnalisadorSemantico(debugMode);
             semantico.analisar(programa);
             TabelaSimbolos tabela = semantico.getTabelaSimbolos();
+
+            if (debugMode) {
+                tabela.printScopes();
+            }
 
             JavaCodeGenerator generator = new JavaCodeGenerator(className, DEFAULT_OUTPUT_DIR);
             generator.writeJavaFile(programa, tabela);
@@ -91,6 +108,7 @@ public class Main {
 
         } catch (Exception e) {
             System.err.println("ERRO NA ANÁLISE: " + e.getMessage());
+            if (debugMode) e.printStackTrace();
             return false;
         }
     }
