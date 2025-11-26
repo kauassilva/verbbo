@@ -24,8 +24,6 @@ public class AnalisadorSemantico {
     }
 
     public void analisar(Program program) throws SemanticException {
-        System.out.println("\n=== ANÁLISE SEMÂNTICA ===");
-
         // Primeira passagem: coleta declarações
         Set<String> variaveisDeclaradas = coletarDeclaracoes(program.statements());
 
@@ -47,10 +45,6 @@ public class AnalisadorSemantico {
             System.err.println("=".repeat(60));
             throw new SemanticException("Análise semântica falhou com " + erros.size() + " erro(s)");
         }
-
-        System.out.println("Análise semântica concluída com sucesso!");
-        System.out.println(" - Variáveis declaradas: " + variaveisDeclaradas.size());
-        System.out.println(" - Sem erros detectados");
     }
 
     private Set<String> coletarDeclaracoes(List<Statement> statements) {
@@ -175,14 +169,11 @@ public class AnalisadorSemantico {
             ));
         }
 
-        System.out.println("Analisando bloco 'se'");
-
         tabelaSimbolos.pushScope();
         analisarStatement(ifStmt.thenCondition(), todasVariaveis);
         tabelaSimbolos.popScope();
 
         if (ifStmt.elseCondition() != null) {
-            System.out.println("Analisando bloco 'senão'");
             tabelaSimbolos.pushScope();
             analisarStatement(ifStmt.elseCondition(), todasVariaveis);
             tabelaSimbolos.popScope();
@@ -198,8 +189,6 @@ public class AnalisadorSemantico {
                     tipoParaString(tipoCondicao)
             ));
         }
-
-        System.out.println("Analisando bloco 'enquanto'");
 
         tabelaSimbolos.pushScope();
         for (Statement stmt : whileStmt.body()) {

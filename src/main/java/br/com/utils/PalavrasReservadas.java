@@ -12,7 +12,7 @@ public class PalavrasReservadas {
         add(new String[]{"crie", "criar", "faça", "monte"}, TokenType.VERBO_CRIAR);
         add(new String[]{"exibir", "exiba", "mostrar", "mostre", "imprimir", "imprima"}, TokenType.VERBO_MOSTRAR);
         add(new String[]{"atribuir", "atribua", "definir", "defina", "seja", "valer", "vale", "valendo",
-                "ter", "tenha", "tera", "obtenha", "receber", "receba", "como"}, TokenType.VERBO_ATRIBUIR);
+                "ter", "tenha", "tera", "obtenha", "receber", "receba", "como", "terá"}, TokenType.VERBO_ATRIBUIR);
 
         add(new String[]{"numero", "número", "numerico", "numérico", "inteiro", "decimal"}, TokenType.TIPO_NUMERICO);
         add(new String[]{"texto", "string", "frase", "palavra", "palávra"}, TokenType.TIPO_TEXTO);
@@ -26,14 +26,14 @@ public class PalavrasReservadas {
         add(new String[]{"/","divisão", "dividir", "divida"}, TokenType.VERBO_DIVIDIR);
 
         add(new String[]{"se", "caso", "contanto"}, TokenType.CONDICIONAL_SE);
-        add(new String[]{"senão", "exceto", "mas", "do contrário", "caso contrário"}, TokenType.CONDICIONAL_SENAO);
+        add(new String[]{"senao", "senão", "exceto", "mas", "do contrário", "caso contrário", "do contrario", "caso contrario"}, TokenType.CONDICIONAL_SENAO);
 
         add(new String[]{"<", "menor", "menor que"}, TokenType.COMPARADOR_MENOR);
         add(new String[]{">" ,"maior", "maior que"}, TokenType.COMPARADOR_MAIOR);
         add(new String[]{"=" ,"igual", "igual a", "é igual", "for igual"}, TokenType.COMPARADOR_IGUAL);
         add(new String[]{"<=" ,"menor ou igual", "menor igual"}, TokenType.COMPARADOR_MENOR_IGUAL);
         add(new String[]{">=" ,"maior ou igual", "maior igual"}, TokenType.COMPARADOR_MAIOR_IGUAL);
-        add(new String[]{"!=" ,"diferente", "diferente de", "não igual"}, TokenType.COMPARADOR_DIFERENTE);
+        add(new String[]{"!=" ,"diferente", "diferente de", "não igual", "nao igual"}, TokenType.COMPARADOR_DIFERENTE);
 
         add(new String[]{"a", "à", "ao", "o", "de", "do", "da", "um"}, TokenType.CONECTOR_RUIDO);
         add(new String[]{"e"}, TokenType.CONECTOR_E);

@@ -1,6 +1,0 @@
-Crie o numero $x valendo 10 e mostre x
-Crie o numero $a valendo 5 e Crie o numero $b valendo 3 e Crie o numero $soma valendo $a mais $b e mostre soma
-Crie o numero $idade valendo 18 e Crie o booleano $maior valendo $idade maior 17 e mostre maior
-Crie o numero $nota valendo 8.5 e Se $nota maior ou igual 7 mostre nota
-Crie o texto $nome valendo "João" e mostre nome
-Mano crie uma $pessoa valendo João e mostre essa pessoa
