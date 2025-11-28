@@ -12,10 +12,10 @@ public class PalavrasReservadas {
         add(new String[]{"crie", "criar", "faça", "monte"}, TokenType.VERBO_CRIAR);
         add(new String[]{"exibir", "exiba", "mostrar", "mostre", "imprimir", "imprima"}, TokenType.VERBO_MOSTRAR);
         add(new String[]{"atribuir", "atribua", "definir", "defina", "seja", "valer", "vale", "valendo",
-                "ter", "tenha", "tera", "obtenha", "receber", "receba", "como", "terá"}, TokenType.VERBO_ATRIBUIR);
+                "ter", "tenha", "tera", "obtenha", "receber", "receba", "recebendo", "como", "terá"}, TokenType.VERBO_ATRIBUIR);
 
         add(new String[]{"numero", "número", "numerico", "numérico", "inteiro", "decimal"}, TokenType.TIPO_NUMERICO);
-        add(new String[]{"texto", "string", "frase", "palavra", "palávra"}, TokenType.TIPO_TEXTO);
+        add(new String[]{"texto", "string", "frase", "palavra", "palávra", "mensagem"}, TokenType.TIPO_TEXTO);
         add(new String[]{"booleano", "lógico", "verdadeiro", "falso", "true", "false"}, TokenType.TIPO_BOOLEANO);
 
         add(new String[]{"+", "somar", "some", "adicionar", "adicione",
@@ -35,7 +35,7 @@ public class PalavrasReservadas {
         add(new String[]{">=" ,"maior ou igual", "maior igual"}, TokenType.COMPARADOR_MAIOR_IGUAL);
         add(new String[]{"!=" ,"diferente", "diferente de", "não igual", "nao igual"}, TokenType.COMPARADOR_DIFERENTE);
 
-        add(new String[]{"a", "à", "ao", "o", "de", "do", "da", "um"}, TokenType.CONECTOR_RUIDO);
+        add(new String[]{"a", "à", "ao", "o", "de", "do", "da", "um", "for"}, TokenType.CONECTOR_RUIDO);
         add(new String[]{"e"}, TokenType.CONECTOR_E);
         add(new String[]{"ou"}, TokenType.CONECTOR_OU);
         add(new String[]{"para"}, TokenType.CONECTOR_PARA);

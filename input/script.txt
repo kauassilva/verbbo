@@ -1,4 +1,1 @@
-Crie o numero $x valendo 10
-se x maior que 5 mostre x
-senao mostre "Não é maior que 5"
-
+Crie o texto $recebaa valendo "AMEN SEJE" e mostre recebaa

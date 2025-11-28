@@ -33,3 +33,7 @@ Se $x menor que 5 mostre x
 Crie um numero para o $contador valendo 0
 Se $x maior que 10 e x menor que 100 mostre x
 Crie o numero $total valendo 0 e adicione 10 ao total e multiplique total por 2 e mostre total
+
+Crie o numero $x valendo 10
+se x maior que 5 mostre x
+senao mostre "Não é maior que 5"

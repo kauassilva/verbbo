@@ -16,6 +16,7 @@ public class AnalisadorSintatico {
     private final List<Token> tokens;
     private int pos = 0;
     private final Set<String> declaredVars = new HashSet<>();
+    private boolean allowLogicalOperators = true; // controla se 'e'/'ou' são tratados como operadores lógicos
 
     public AnalisadorSintatico(List<Token> tokens) {
         this.tokens = tokens;
@@ -125,6 +126,11 @@ public class AnalisadorSintatico {
         pularRuidoEIdentificadores();
         Expression value;
 
+        while (!estaNoFinal() && (checar(TokenType.CONECTOR_E) || checar(TokenType.CONECTOR_RUIDO))) {
+            avancar();
+            pularRuidoEIdentificadores();
+        }
+
         if (match(TokenType.VERBO_ATRIBUIR)) {
             pularRuidoEIdentificadores();
             value = parseExpression();
@@ -145,14 +151,21 @@ public class AnalisadorSintatico {
         pularRuidoEIdentificadores();
 
         List<Statement> prints = new ArrayList<>();
-        Expression expr = parseExpression();
-        prints.add(new PrintStatement(expr));
+        // Desabilita operadores lógicos dentro do parsing dos argumentos do 'mostre'
+        boolean previousAllow = allowLogicalOperators;
+        allowLogicalOperators = false;
+        try {
+            Expression expr = parseExpression();
+            prints.add(new PrintStatement(expr));
 
-        while (checar(TokenType.CONECTOR_E) && espiaExpressaoInicial()) {
-            avancar();
-            pularRuidoEIdentificadores();
-            Expression e = parseExpression();
-            prints.add(new PrintStatement(e));
+            while (checar(TokenType.CONECTOR_E) && espiaExpressaoInicial()) {
+                avancar();
+                pularRuidoEIdentificadores();
+                Expression e = parseExpression();
+                prints.add(new PrintStatement(e));
+            }
+        } finally {
+            allowLogicalOperators = previousAllow;
         }
 
         if (prints.size() == 1) return prints.get(0);
@@ -180,7 +193,7 @@ public class AnalisadorSintatico {
 
     private Expression parseLogicalOr() {
         Expression expr = parseLogicalAnd();
-        while (checar(TokenType.CONECTOR_OU) && nextIsStartOfExpression()) {
+        while (allowLogicalOperators && checar(TokenType.CONECTOR_OU) && nextIsStartOfExpression()) {
             avancar();
             Token operator = anterior();
             Expression right = parseLogicalAnd();
@@ -191,7 +204,7 @@ public class AnalisadorSintatico {
 
     private Expression parseLogicalAnd() {
         Expression expr = parseEquality();
-        while (checar(TokenType.CONECTOR_E) && nextIsStartOfExpression()) {
+        while (allowLogicalOperators && checar(TokenType.CONECTOR_E) && nextIsStartOfExpression()) {
             avancar();
             Token operator = anterior();
             Expression right = parseEquality();
