@@ -20,7 +20,6 @@ const keywordMap = {
     'se': 'CONDICIONAL_SE', 'caso': 'CONDICIONAL_SE',
     'senao': 'CONDICIONAL_SENAO', 'entao': 'CONDICIONAL_ENTAO',
 
-    // Comparadores
     'maior': 'COMPARADOR_MAIOR',
     'menor': 'COMPARADOR_MENOR',
     'igual': 'COMPARADOR_IGUAL',
