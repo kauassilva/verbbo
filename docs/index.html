@@ -13,8 +13,6 @@
 
     <link rel="stylesheet" href="style.css">
 
-    <link rel="icon" type="image/png" href="img/icon.png">
-
     <script>
         tailwind.config = {
             theme: {
@@ -68,6 +66,7 @@
         <div class="hidden md:flex gap-8 font-medium text-gray-300">
             <a href="#home" class="hover:text-verbbo-glow transition-colors">Início</a>
             <a href="#concept" class="hover:text-verbbo-glow transition-colors">Conceito</a>
+            <a href="#reference" class="hover:text-verbbo-glow transition-colors">Dicionário</a>
             <a href="#analyzer" class="hover:text-verbbo-glow transition-colors">Testar Agora</a>
             <a href="https://github.com/kauassilva/verbbo" target="_blank" class="hover:text-white"><i class="fab fa-github text-xl"></i></a>
         </div>
@@ -171,6 +170,124 @@
     </div>
 </section>
 
+<section id="reference" class="relative z-10 py-20 bg-black/10 backdrop-blur-sm">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-16">
+            <span class="text-verbbo-glow font-mono text-sm tracking-widest uppercase">Documentação</span>
+            <h2 class="text-4xl font-bold mt-2 mb-4">Dicionário do Verbbo</h2>
+            <div class="h-1 w-20 bg-gradient-to-r from-cyan-500 to-purple-500 mx-auto rounded-full"></div>
+            <p class="text-gray-400 mt-4 max-w-2xl mx-auto">
+                Abaixo você encontra todas as palavras que o Verbbo entende. Use qualquer variação listada para executar a ação desejada.
+            </p>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-8">
+
+            <div class="space-y-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="p-2 bg-purple-500/20 rounded-lg text-purple-400"><i class="fas fa-bolt"></i></div>
+                    <h3 class="text-2xl font-bold text-white">Ação</h3>
+                </div>
+
+                <div class="glass-panel rounded-xl overflow-hidden">
+                    <div class="p-4 bg-white/5 border-b border-white/10 font-bold text-verbbo-glow">
+                        Criação de Variáveis
+                    </div>
+                    <div class="p-4 text-sm text-gray-300 font-mono leading-relaxed">
+                        Crie, criar, faça, monte
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-xl overflow-hidden">
+                    <div class="p-4 bg-white/5 border-b border-white/10 font-bold text-verbbo-glow">
+                        Exibição
+                    </div>
+                    <div class="p-4 text-sm text-gray-300 font-mono leading-relaxed">
+                        Exibir, Exiba, mostrar, mostre, imprimir, imprima
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-xl overflow-hidden">
+                    <div class="p-4 bg-white/5 border-b border-white/10 font-bold text-verbbo-glow">
+                        Atribuição
+                    </div>
+                    <div class="p-4 text-sm text-gray-300 font-mono leading-relaxed">
+                        Atribuir, Atribua, definir, defina, seja, valer, vale, valendo, ter, tenha, obtenha, receber, RECEBA
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="p-2 bg-cyan-500/20 rounded-lg text-cyan-400"><i class="fas fa-calculator"></i></div>
+                    <h3 class="text-2xl font-bold text-white">Operação</h3>
+                </div>
+
+                <div class="glass-panel rounded-xl overflow-hidden">
+                    <div class="p-4 bg-white/5 border-b border-white/10 font-bold text-cyan-400">
+                        Soma (+)
+                    </div>
+                    <div class="p-4 text-sm text-gray-300 font-mono leading-relaxed">
+                        Somar, some, adicionar, adicione, juntar, junte, acrescentar, acrescente, mais
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-xl overflow-hidden">
+                    <div class="p-4 bg-white/5 border-b border-white/10 font-bold text-cyan-400">
+                        Subtração (-)
+                    </div>
+                    <div class="p-4 text-sm text-gray-300 font-mono leading-relaxed">
+                        Subtração, Subtrair, subtraia, tirar, tire, retirar, retire, diminuir, diminua, reduza, reduzir, menos
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-xl overflow-hidden">
+                    <div class="p-4 bg-white/5 border-b border-white/10 font-bold text-cyan-400">
+                        Multiplicação (*)
+                    </div>
+                    <div class="p-4 text-sm text-gray-300 font-mono leading-relaxed">
+                        Multiplicar, multiplique, multiplicação, vezes
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-xl overflow-hidden">
+                    <div class="p-4 bg-white/5 border-b border-white/10 font-bold text-cyan-400">
+                        Divisão (/)
+                    </div>
+                    <div class="p-4 text-sm text-gray-300 font-mono leading-relaxed">
+                        Divisão, dividir, divida
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="p-2 bg-pink-500/20 rounded-lg text-pink-400"><i class="fas fa-code-branch"></i></div>
+                    <h3 class="text-2xl font-bold text-white">Condicionais</h3>
+                </div>
+
+                <div class="glass-panel rounded-xl overflow-hidden">
+                    <div class="p-4 bg-white/5 border-b border-white/10 font-bold text-pink-400">
+                        Se (If)
+                    </div>
+                    <div class="p-4 text-sm text-gray-300 font-mono leading-relaxed">
+                        Se, caso, contanto
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-xl overflow-hidden">
+                    <div class="p-4 bg-white/5 border-b border-white/10 font-bold text-pink-400">
+                        Senão (Else)
+                    </div>
+                    <div class="p-4 text-sm text-gray-300 font-mono leading-relaxed">
+                        Senão, exceto, mas, do contrário, caso contrário
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <section id="analyzer" class="relative z-10 py-20 bg-black/20 backdrop-blur-sm border-y border-white/5">
     <div class="container mx-auto px-6">
         <div class="flex flex-col md:flex-row justify-between items-end mb-10 gap-4">
@@ -215,6 +332,49 @@
     </div>
 </section>
 
+<section id="examples" class="relative z-10 py-20">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-16">
+            <span class="text-verbbo-glow font-mono text-sm tracking-widest uppercase">Aprenda na Prática</span>
+            <h2 class="text-4xl font-bold mt-2 mb-4">Exemplos Práticos</h2>
+            <div class="h-1 w-20 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto rounded-full"></div>
+            <p class="text-gray-400 mt-4">Veja abaixo alguns exemplos de scripts para usar no playground.</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="glass-panel rounded-xl p-6 hover:border-purple-500/50 transition-colors group hover:-translate-y-2 duration-300">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-lg text-purple-400">Operação Matemática</h3>
+                    <i class="fas fa-code text-gray-500 group-hover:text-white transition-colors text-xs border border-gray-500 group-hover:border-white rounded-full p-2"></i>
+                </div>
+                <div class="bg-black/30 rounded-lg p-4 font-mono text-sm text-gray-300 relative border border-white/5">
+                    <p class="pointer-events-none">Crie o numero $a valendo 50 e Crie o numero $b valendo 25 e mostre a + b</p>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-xl p-6 hover:border-cyan-500/50 transition-colors group hover:-translate-y-2 duration-300">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-lg text-cyan-400">Lógica Condicional</h3>
+                    <i class="fas fa-code text-gray-500 group-hover:text-white transition-colors text-xs border border-gray-500 group-hover:border-white rounded-full p-2"></i>
+                </div>
+                <div class="bg-black/30 rounded-lg p-4 font-mono text-sm text-gray-300 relative border border-white/5">
+                    <p class="pointer-events-none">Crie o numero $idade valendo 20 se idade maior ou igual 18 mostre "Acesso Permitido" senao mostre "Bloqueado"</p>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-xl p-6 hover:border-pink-500/50 transition-colors group hover:-translate-y-2 duration-300">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-lg text-pink-400">Manipulação de Texto</h3>
+                    <i class="fas fa-code text-gray-500 group-hover:text-white transition-colors text-xs border border-gray-500 group-hover:border-white rounded-full p-2"></i>
+                </div>
+                <div class="bg-black/30 rounded-lg p-4 font-mono text-sm text-gray-300 relative border border-white/5">
+                    <p class="pointer-events-none">Crie o texto $saudacao valendo "Bem vindo ao " e Crie o texto $projeto valendo "Verbbo" e mostre saudacao e projeto</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <footer class="relative z-10 border-t border-white/10 bg-black/40 py-10">
     <div class="container mx-auto px-6 text-center">
         <div class="mb-4">
@@ -235,6 +395,5 @@
 </footer>
 
 <script src="script.js"></script>
-
 </body>
 </html>
