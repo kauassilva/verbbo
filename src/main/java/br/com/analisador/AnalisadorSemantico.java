@@ -16,16 +16,21 @@ public class AnalisadorSemantico {
     private final TabelaSimbolos tabelaSimbolos;
     private final List<String> erros;
     private final Set<String> variaveisUsadasAntesDeclaracao;
+    private final boolean debugMode; // Novo campo
 
-    public AnalisadorSemantico() {
+    public AnalisadorSemantico(boolean debugMode) {
         this.tabelaSimbolos = new TabelaSimbolos();
         this.erros = new java.util.ArrayList<>();
         this.variaveisUsadasAntesDeclaracao = new HashSet<>();
+        this.debugMode = debugMode;
+    }
+
+    // Sobrecarga para manter compatibilidade caso necessário (default false)
+    public AnalisadorSemantico() {
+        this(false);
     }
 
     public void analisar(Program program) throws SemanticException {
-        System.out.println("\n=== ANÁLISE SEMÂNTICA ===");
-
         // Primeira passagem: coleta declarações
         Set<String> variaveisDeclaradas = coletarDeclaracoes(program.statements());
 
@@ -34,9 +39,6 @@ public class AnalisadorSemantico {
             analisarStatement(stmt, variaveisDeclaradas);
         }
 
-        tabelaSimbolos.printScopes();
-
-//        TODO - Resolver o erro do System.err com buffer diferente
         if (!erros.isEmpty()) {
             System.err.println("\n" + "=".repeat(60));
             System.err.println("ERROS SEMÂNTICOS ENCONTRADOS: " + erros.size());
@@ -47,10 +49,6 @@ public class AnalisadorSemantico {
             System.err.println("=".repeat(60));
             throw new SemanticException("Análise semântica falhou com " + erros.size() + " erro(s)");
         }
-
-        System.out.println("Análise semântica concluída com sucesso!");
-        System.out.println(" - Variáveis declaradas: " + variaveisDeclaradas.size());
-        System.out.println(" - Sem erros detectados");
     }
 
     private Set<String> coletarDeclaracoes(List<Statement> statements) {
@@ -117,27 +115,26 @@ public class AnalisadorSemantico {
             return;
         }
 
-        // Verifica se é um literal direto ou expressão computada
         boolean isLiteralDireto = decl.inicializador() instanceof Literal;
         Object valorInicial = isLiteralDireto ? extrairValor(decl.inicializador()) : null;
 
         Simbolo simbolo;
         if (isLiteralDireto) {
-            // Literal direto: valor conhecido e inicializada=true
             simbolo = new Simbolo(nomeVar, tipoVar, valorInicial);
         } else {
-            // Expressão computada: valor null e inicializada=false
             simbolo = new Simbolo(nomeVar, tipoVar);
         }
 
         tabelaSimbolos.declare(nomeVar, simbolo);
 
-        System.out.printf("Declarada: %-15s : %-10s = %s%s%n",
-                nomeVar,
-                tipoParaString(tipoVar),
-                formatarValor(valorInicial),
-                isLiteralDireto ? "" : " (expressão computada)"
-        );
+        if (debugMode) {
+            System.out.printf("Declarada: %-15s : %-10s = %s%s%n",
+                    nomeVar,
+                    tipoParaString(tipoVar),
+                    formatarValor(valorInicial),
+                    isLiteralDireto ? "" : " (expressão computada)"
+            );
+        }
     }
 
     private void analisarAssignment(Assignment assign) {
@@ -160,9 +157,11 @@ public class AnalisadorSemantico {
             return;
         }
 
-        System.out.printf("Atribuição válida: %s = ... (tipo: %s)%n",
-                nomeVar, tipoParaString(tipoVar)
-        );
+        if (debugMode) {
+            System.out.printf("Atribuição válida: %s = ... (tipo: %s)%n",
+                    nomeVar, tipoParaString(tipoVar)
+            );
+        }
     }
 
     private void analisarIfStatement(IfStatement ifStmt, Set<String> todasVariaveis) {
@@ -175,14 +174,11 @@ public class AnalisadorSemantico {
             ));
         }
 
-        System.out.println("Analisando bloco 'se'");
-
         tabelaSimbolos.pushScope();
         analisarStatement(ifStmt.thenCondition(), todasVariaveis);
         tabelaSimbolos.popScope();
 
         if (ifStmt.elseCondition() != null) {
-            System.out.println("Analisando bloco 'senão'");
             tabelaSimbolos.pushScope();
             analisarStatement(ifStmt.elseCondition(), todasVariaveis);
             tabelaSimbolos.popScope();
@@ -198,8 +194,6 @@ public class AnalisadorSemantico {
                     tipoParaString(tipoCondicao)
             ));
         }
-
-        System.out.println("Analisando bloco 'enquanto'");
 
         tabelaSimbolos.pushScope();
         for (Statement stmt : whileStmt.body()) {
@@ -243,11 +237,12 @@ public class AnalisadorSemantico {
             }
 
             Simbolo simbolo = tabelaSimbolos.lookup(name);
-            System.out.printf("Uso válido: %-15s (tipo: %s)%n",
-                    name, tipoParaString(simbolo.getTipoVariavel())
-            );
+            if (debugMode) {
+                System.out.printf("Uso válido: %-15s (tipo: %s)%n",
+                        name, tipoParaString(simbolo.getTipoVariavel())
+                );
+            }
         } else {
-            // Se não for variável, apenas verifica o tipo da expressão
             inferirTipo(expr);
         }
     }
@@ -288,7 +283,6 @@ public class AnalisadorSemantico {
         TokenType tipoDir = inferirTipo(binExpr.right());
         TokenType operador = binExpr.operator().getTipo();
 
-        // Operações aritméticas: +, -, *, /
         if (operador == TokenType.VERBO_SOMAR || operador == TokenType.VERBO_SUBTRAIR ||
                 operador == TokenType.VERBO_MULTIPLICAR || operador == TokenType.VERBO_DIVIDIR) {
 
@@ -308,12 +302,12 @@ public class AnalisadorSemantico {
                 return TokenType.ERRO_LEXICO;
             }
 
-            System.out.printf("Operação aritmética válida: %s%n",
-                    operadorParaString(operador));
+            if (debugMode) {
+                System.out.printf("Operação aritmética válida: %s%n", operadorParaString(operador));
+            }
             return TokenType.TIPO_NUMERICO;
         }
 
-        // Comparações: <, >, <=, >=, ==, !=
         if (operador == TokenType.COMPARADOR_MENOR || operador == TokenType.COMPARADOR_MAIOR ||
                 operador == TokenType.COMPARADOR_MENOR_IGUAL || operador == TokenType.COMPARADOR_MAIOR_IGUAL ||
                 operador == TokenType.COMPARADOR_IGUAL || operador == TokenType.COMPARADOR_DIFERENTE) {
@@ -325,13 +319,13 @@ public class AnalisadorSemantico {
                 ));
                 return TokenType.ERRO_LEXICO;
             }
-
-            System.out.printf("Comparação válida: %s entre %s%n",
-                    operadorParaString(operador), tipoParaString(tipoEsq));
+            if (debugMode) {
+                System.out.printf("Comparação válida: %s entre %s%n",
+                        operadorParaString(operador), tipoParaString(tipoEsq));
+            }
             return TokenType.TIPO_BOOLEANO;
         }
 
-        // Operadores lógicos: e, ou
         if (operador == TokenType.CONECTOR_E || operador == TokenType.CONECTOR_OU) {
             if (tipoEsq != TokenType.TIPO_BOOLEANO || tipoDir != TokenType.TIPO_BOOLEANO) {
                 erros.add(String.format(
@@ -340,9 +334,9 @@ public class AnalisadorSemantico {
                 ));
                 return TokenType.ERRO_LEXICO;
             }
-
-            System.out.printf("Operação lógica válida: %s%n",
-                    operadorParaString(operador));
+            if (debugMode) {
+                System.out.printf("Operação lógica válida: %s%n", operadorParaString(operador));
+            }
             return TokenType.TIPO_BOOLEANO;
         }
 

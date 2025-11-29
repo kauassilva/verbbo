@@ -1,0 +1,1 @@
+Crie o texto $recebaa valendo "AMEN SEJE" e mostre recebaa
