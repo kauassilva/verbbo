@@ -82,7 +82,6 @@ public class JavaCodeGenerator {
     public void writeJavaFile(Program programa, TabelaSimbolos tabelaSimbolos) throws GeneratorException {
         Path outDir = Path.of(pathToClass);
         generate(programa, tabelaSimbolos, outDir);
-        System.out.println("Arquivo Java escrito em: " + outDir.resolve(className + ".java"));
     }
 
 }
