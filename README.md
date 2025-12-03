@@ -46,3 +46,5 @@ senao
     mostre "Menor de idade"
 ```
 ---
+# 🏁 QR CODE PARA O SITE
+![qrcode.png](docs/img/qrcode.png)
