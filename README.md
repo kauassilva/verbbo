@@ -56,7 +56,7 @@ enquanto contador menor ou igual 5 execute {
     contador somando 1
 }
 ```
-
+https://www.canva.com/design/DAG6aGqfaD0/nqcAOfEICv9KRJ_SLuzoyg/edit
 
 ```
 Notas: As palavras `execute` e `repita` são opcionais após a condição do while.
