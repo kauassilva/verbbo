@@ -45,4 +45,16 @@ se idade maior ou igual 18 então
 senao
     mostre "Menor de idade"
 ```
----
+
+- While:
+```
+Crie o numero $contador valendo 1
+enquanto contador menor ou igual 5 execute {
+    mostre contador
+    contador somando 1
+}
+```
+
+
+```
+Notas: As palavras `execute` e `repita` são opcionais após a condição do while.

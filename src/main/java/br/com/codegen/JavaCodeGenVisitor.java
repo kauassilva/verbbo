@@ -104,11 +104,21 @@ public class JavaCodeGenVisitor implements Visitor<Void> {
 
     @Override
     public Void visitAssignment(Assignment assignment) {
+        String expr = emitExpression(assignment.value());
+        w.writeLine(assignment.name() + " = " + expr + ";");
         return null;
     }
 
     @Override
     public Void visitWhileStatement(WhileStatement whileStatement) {
+        String cond = emitExpression(whileStatement.condition());
+        w.writeLine("while (" + cond + ") {");
+        w.indent();
+        for (Statement stmt : whileStatement.body()) {
+            stmt.accept(this);
+        }
+        w.unindent();
+        w.writeLine("}");
         return null;
     }
 

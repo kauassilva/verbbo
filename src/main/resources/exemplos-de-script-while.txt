@@ -1,0 +1,24 @@
+Crie o numero $i valendo 1 e enquanto i menor ou igual 3 execute { mostre i e i somando 1 }
+Crie o numero $x valendo 0 e enquanto x menor que 5 repita { mostre x e x valendo x + 1 }
+Crie o numero $n valendo 3 e enquanto n maior que 0 mostre n
+Crie o numero $j valendo 1 e enquanto j menor ou igual 3 { mostre j e j somando 1 e mostre j }
+Crie o numero $valor valendo 10 e enquanto valor maior que 0 e valor menor que 100 execute { valor somando 5 e mostre valor }
+Crie o numero $k valendo 1 e enquanto k menor que 4 execute { k somando 1 e mostre k }
+Crie o numero $m valendo 1 e enquanto m menor que 4 execute { m somando 1 e mostre m }
+Crie o numero $p valendo 1 e enquanto p menor que 4 repita { p somando 1 e mostre p }
+Crie o numero $v1 valendo 0 e enquanto v1 menor que 3 { v1 somando 1 e mostre v1 }
+Crie o numero $v2 valendo 5 e enquanto v2 maior que 2 { v2 subtraindo 1 e mostre v2 }
+Crie o numero $v4 valendo 5 e enquanto v4 maior ou igual 3 { v4 subtraindo 1 e mostre v4 }
+Crie o numero $v5 valendo 0 e enquanto v5 diferente de 3 { v5 somando 1 e mostre v5 }
+
+Crie o numero $i valendo 1 e enquanto i menor ou igual 2 {
+    Crie o numero $j valendo 1 e enquanto j menor ou igual 2 {
+        mostre i e mostre j e j somando 1
+    } e i somando 1
+}
+
+Crie o numero $contador valendo 1
+enquanto contador menor ou igual 5 execute {
+    mostre contador
+    contador somando 1
+}

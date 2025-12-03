@@ -25,8 +25,14 @@ public class PalavrasReservadas {
         add(new String[]{"*","multiplicar", "multiplique", "multiplicação", "vezes"}, TokenType.VERBO_MULTIPLICAR);
         add(new String[]{"/","divisão", "dividir", "divida"}, TokenType.VERBO_DIVIDIR);
 
+        add(new String[]{"somando", "adicionando", "incrementando"}, TokenType.VERBO_SOMANDO);
+        add(new String[]{"subtraindo", "diminuindo", "decrementando"}, TokenType.VERBO_SUBTRAINDO);
+
         add(new String[]{"se", "caso", "contanto"}, TokenType.CONDICIONAL_SE);
         add(new String[]{"senao", "senão", "exceto", "mas", "do contrário", "caso contrário", "do contrario", "caso contrario"}, TokenType.CONDICIONAL_SENAO);
+
+        add(new String[]{"enquanto"}, TokenType.REPETICAO_ENQUANTO);
+        add(new String[]{"execute", "repita"}, TokenType.REPETICAO_REPITA);
 
         add(new String[]{"<", "menor", "menor que"}, TokenType.COMPARADOR_MENOR);
         add(new String[]{">" ,"maior", "maior que"}, TokenType.COMPARADOR_MAIOR);
