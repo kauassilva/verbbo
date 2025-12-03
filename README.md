@@ -3,7 +3,9 @@
 **Verbbo** é um mini-compilador escrito em Java cujo objetivo é servir como um projeto didático para estudar as fases clássicas de compilação: análise léxica, análise sintática, análise semântica e geração de código.
 
 > Página do projeto: https://kauassilva.github.io/verbbo/
-> Slide do projeto: https://www.canva.com/design/DAG6aGqfaD0/nqcAOfEICv9KRJ_SLuzoyg/
+
+> Slide do projeto: https://www.canva.com/design/DAG6aGqfaD0/nqcAOfEICv9KRJ_SLuzoyg/edit
+
 # 🏁 QR CODE PARA O SITE
 ![qrcode.png](docs/img/qrcode.png)
 
