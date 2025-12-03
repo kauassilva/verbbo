@@ -25,6 +25,6 @@ public record Assignment(String name, Expression value) implements Statement {
 
     @Override
     public <R> R accept(Visitor<R> visitor) {
-        return null;
+        return visitor.visitAssignment(this);
     }
 }

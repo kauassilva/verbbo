@@ -19,11 +19,20 @@ public record WhileStatement(Expression condition, List<Statement> body) impleme
     @Override
     public List<String> getUsedVariables() {
         List<String> vars = new ArrayList<>();
-        if (condition instanceof Variable) {
-            vars.add(((Variable) condition).name());
-        }
+        collectVariablesFromExpression(condition, vars);
         body.forEach(s -> vars.addAll(s.getUsedVariables()));
         return vars;
+    }
+
+    private void collectVariablesFromExpression(Expression expr, List<String> vars) {
+        if (expr instanceof Variable v) {
+            vars.add(v.name());
+        } else if (expr instanceof BinaryExpression b) {
+            collectVariablesFromExpression(b.left(), vars);
+            collectVariablesFromExpression(b.right(), vars);
+        } else if (expr instanceof UnaryExpression u) {
+            collectVariablesFromExpression(u.right(), vars);
+        }
     }
 
     @Override

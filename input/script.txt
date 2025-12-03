@@ -1,1 +1,5 @@
-Crie o texto $recebaa valendo "AMEN SEJE" e mostre recebaa
+Crie o numero $contador valendo 1
+enquanto contador menor ou igual 5 execute {
+    mostre contador
+    contador somando 1
+}

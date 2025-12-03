@@ -26,7 +26,7 @@ public class AnalisadorSintatico {
         List<Statement> statements = new ArrayList<>();
 
         while (!estaNoFinal()) {
-            pularRuidoEIdentificadores(); // Nova função que pula ruído E identificadores soltos
+            pularRuidoEIdentificadores();
 
             if (estaNoFinal()) break;
 
@@ -34,7 +34,7 @@ public class AnalisadorSintatico {
             seq.add(parseStatement());
 
             while (match(TokenType.CONECTOR_E)) {
-                pularRuidoEIdentificadores();
+                pularRuidos();
                 if (!estaNoFinal()) {
                     seq.add(parseStatement());
                 }
@@ -48,8 +48,46 @@ public class AnalisadorSintatico {
     }
 
     private Statement parseStatement() {
-        // Pula palavras soltas até encontrar um comando válido
-        pularRuidoEIdentificadores();
+        if (checar(TokenType.IDENTIFICADOR) || checar(TokenType.DECLARACAO_VARIAVEL)) {
+            int savePos = pos;
+            Token varToken = avancar();
+            String varName = varToken.getValor();
+            if (varName.startsWith("$")) varName = varName.substring(1);
+
+            pularRuidos();
+
+            if (checar(TokenType.VERBO_ATRIBUIR)) {
+                avancar();
+                pularRuidoEIdentificadores();
+                Expression value = parseExpression();
+                return new Assignment(varName, value);
+            }
+            else if (checar(TokenType.VERBO_SOMANDO) || checar(TokenType.VERBO_SUBTRAINDO)) {
+                Token opToken = avancar();
+                pularRuidoEIdentificadores();
+
+                if (checar(TokenType.VERBO_SOMAR) || checar(TokenType.VERBO_SUBTRAIR)) {
+                    avancar();
+                }
+
+                pularRuidoEIdentificadores();
+                Expression right = parseExpression();
+
+                Token operador;
+                if (opToken.getTipo() == TokenType.VERBO_SOMANDO) {
+                    operador = new Token(TokenType.VERBO_SOMAR, "+");
+                } else {
+                    operador = new Token(TokenType.VERBO_SUBTRAIR, "-");
+                }
+
+                Expression value = new BinaryExpression(new Variable(varName), operador, right);
+                return new Assignment(varName, value);
+            }
+            else {
+                pos = savePos;
+            }
+        }
+        pularApenasRuidos();
 
         if (match(TokenType.VERBO_CRIAR)) {
             return parseCreateStatements();
@@ -60,8 +98,11 @@ public class AnalisadorSintatico {
         if (match(TokenType.CONDICIONAL_SE)) {
             return parseIfStatement();
         }
+        if (match(TokenType.REPETICAO_ENQUANTO)) {
+            return parseWhileStatement();
+        }
 
-        throw error(espiar(), "Esperado um comando (criar, mostrar, se, etc)");
+        throw error(espiar(), "Esperado um comando (criar, mostrar, se, enquanto, etc)");
     }
 
     private Statement parseCreateStatements() {
@@ -185,6 +226,43 @@ public class AnalisadorSintatico {
             elseCondition = parseStatement();
         }
         return new IfStatement(condition, thenCondition, elseCondition);
+    }
+
+    private WhileStatement parseWhileStatement() {
+        pularRuidoEIdentificadores();
+
+        Expression condition = parseExpression();
+
+        pularRuidoEIdentificadores();
+
+        match(TokenType.REPETICAO_REPITA);
+
+        pularRuidoEIdentificadores();
+
+        List<Statement> body = new ArrayList<>();
+
+        if (match(TokenType.PONTUACAO_ABRE_CHAVES)) {
+            pularApenasRuidos();
+
+            while (!estaNoFinal() && !checar(TokenType.PONTUACAO_FECHA_CHAVES)) {
+                body.add(parseStatement());
+                pularApenasRuidos();
+
+                while (match(TokenType.CONECTOR_E)) {
+                    pularApenasRuidos();
+                    if (!estaNoFinal() && !checar(TokenType.PONTUACAO_FECHA_CHAVES)) {
+                        body.add(parseStatement());
+                        pularApenasRuidos();
+                    }
+                }
+            }
+
+            consome(TokenType.PONTUACAO_FECHA_CHAVES, "Esperado '}' para fechar o bloco do enquanto");
+        } else {
+            body.add(parseStatement());
+        }
+
+        return new WhileStatement(condition, body);
     }
 
     private Expression parseExpression() {
@@ -352,12 +430,21 @@ public class AnalisadorSintatico {
         return t == TokenType.VERBO_CRIAR ||
                 t == TokenType.VERBO_MOSTRAR ||
                 t == TokenType.CONDICIONAL_SE ||
+                t == TokenType.REPETICAO_ENQUANTO ||
                 t == TokenType.TIPO_NUMERICO ||
                 t == TokenType.TIPO_TEXTO ||
                 t == TokenType.TIPO_BOOLEANO;
     }
 
     private void pularRuidos() {
+        while (!estaNoFinal() && espiar().getTipo() == TokenType.CONECTOR_RUIDO) {
+            String val = espiar().getValor();
+            if (declaredVars.contains(val)) break;
+            avancar();
+        }
+    }
+
+    private void pularApenasRuidos() {
         while (!estaNoFinal() && espiar().getTipo() == TokenType.CONECTOR_RUIDO) {
             String val = espiar().getValor();
             if (declaredVars.contains(val)) break;
@@ -432,6 +519,20 @@ public class AnalisadorSintatico {
         int idx = pos + 1;
         if (idx >= tokens.size()) return false;
         TokenType t = tokens.get(idx).getTipo();
+
+        if (t == TokenType.IDENTIFICADOR || t == TokenType.DECLARACAO_VARIAVEL) {
+            int nextIdx = idx + 1;
+            while (nextIdx < tokens.size() && tokens.get(nextIdx).getTipo() == TokenType.CONECTOR_RUIDO) {
+                nextIdx++;
+            }
+            if (nextIdx < tokens.size()) {
+                TokenType nextType = tokens.get(nextIdx).getTipo();
+                if (nextType == TokenType.VERBO_SOMANDO || nextType == TokenType.VERBO_SUBTRAINDO || nextType == TokenType.VERBO_ATRIBUIR) {
+                    return false;
+                }
+            }
+        }
+
         return t == TokenType.LITERAL_NUMERICO || t == TokenType.LITERAL_TEXTO ||
                 t == TokenType.DECLARACAO_VARIAVEL || t == TokenType.IDENTIFICADOR ||
                 t == TokenType.PONTUACAO_ABRE_PARENTESES || t == TokenType.VERBO_SUBTRAIR ||
