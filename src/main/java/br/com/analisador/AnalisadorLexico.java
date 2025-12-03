@@ -44,7 +44,7 @@ public class AnalisadorLexico {
                 token = lerPalavra();
             }
             // Operadores e simbolos
-            else if (";<>:()=!+-*/".indexOf(caractereAtual) >= 0) {
+            else if (";<>:(){}=!+-*/".indexOf(caractereAtual) >= 0) {
                 token = lerOperadorOuSimbolo();
             } else {
                 token = lerErroLexico();
@@ -130,7 +130,7 @@ public class AnalisadorLexico {
             while (caractereAtual != '\0' &&
                     !Character.isWhitespace(caractereAtual) &&
                     !(Character.isLetterOrDigit(caractereAtual) || TabelaCaracteresValidos.contem(caractereAtual)) &&
-                    !(";<>:()=!+-*/\"".indexOf(caractereAtual) >= 0)
+                    !(";<>:(){}=!+-*/\"".indexOf(caractereAtual) >= 0)
             ) {
                 invalidos.append(caractereAtual);
                 avancar();
@@ -208,7 +208,7 @@ public class AnalisadorLexico {
                 !Character.isDigit(caractereAtual) &&
                 caractereAtual != '"' &&
                 !(Character.isLetter(caractereAtual) || "áàâãéêíóôõúç".indexOf(caractereAtual) >= 0 || caractereAtual == '$') &&
-                !(";<>:()=!+-*/".indexOf(caractereAtual) >= 0)
+                !(";<>:(){}=!+-*/".indexOf(caractereAtual) >= 0)
         ) {
             erro.append(caractereAtual);
             avancar();
