@@ -3,27 +3,29 @@
 **Verbbo** é um mini-compilador escrito em Java cujo objetivo é servir como um projeto didático para estudar as fases clássicas de compilação: análise léxica, análise sintática, análise semântica e geração de código.
 
 > Página do projeto: https://kauassilva.github.io/verbbo/
+# 🏁 QR CODE PARA O SITE
+![qrcode.png](docs/img/qrcode.png)
 
-Resumo rápido
+### Resumo rápido
 - Linguagem de origem: uma linguagem natural-like (português) com verbos como "crie", "mostre", comparadores em palavras, variáveis prefixadas com `$` para declaração.
 - Saída: código Java gerado a partir do script de entrada.
 - Estado: projeto em evolução — funcionalidades básicas (lex/parse/semantic/codegen) implementadas, várias melhorias planejadas.
 ---
-Principais conceitos
+### Principais conceitos
 - Analisador Léxico (lexer): converte texto em tokens (p.ex. TIPO_NUMERICO, DECLARACAO_VARIAVEL, VERBO_CRIAR, CONECTOR_RUIDO etc.).
 - Analisador Sintático (parser): constrói a árvore sintática abstrata (AST) a partir dos tokens.
 - Analisador Semântico: verifica tipos, declarações e prepara uma tabela de símbolos.
 - Geração de Código: converte a AST validada em código Java, que é compilado e executado.
 ---
-Regras de linguagem (resumo)
+### Regras de linguagem (resumo)
 - Declaração de variável numérica: `Crie o numero $x valendo 10` ou `Crie numero $x 10`.
 - Print: `mostre x` ou qualquer outra palavra reservada do token VERBO_MOSTRAR (quando o identificador já existe como variável).
 - Condicional simples: `se <expressão> então <comando> [senao <comando>]`.
 ---
-Execução do projeto
+### Execução do projeto
 - No `Main`, informe o nome da classe e `y/n` caso queira, ou não, ativar o modo debug e visualizar todo o processo (Analise Lexica, Sintatica, Semantica e Gerador de Codigo).
 ---
-Exemplos de scripts (dentro de `input/*.txt`)
+### Exemplos de scripts (dentro de `input/*.txt`)
 - Declaração e print simples:
 ```
 Crie o numero $a valendo 2 e o numero $b valendo 3 e mostre a e b
@@ -45,6 +47,3 @@ se idade maior ou igual 18 então
 senao
     mostre "Menor de idade"
 ```
----
-# 🏁 QR CODE PARA O SITE
-![qrcode.png](docs/img/qrcode.png)
